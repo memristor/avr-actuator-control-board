@@ -3,65 +3,34 @@
 #include <avr/pgmspace.h>
 #include <stdint.h>
 #include <util/delay.h>
-
 #include "can.h"
+#include "can_wrapper.h"
 
-
-// -----------------------------------------------------------------------------
-// Main loop for receiving and sending messages.
+uint8_t lastState = 0;
+uint8_t state = 0;
 
 int main(void) {
-	// Initialize MCP2515
-	can_init(BITRATE_125_KBPS);
+    can_wrapper_init();
 
-    // Set filter to receive all messages
-    can_filter_t filter = {
-        .id = 0,
-        .mask = 0,
-        .flags = {
-            .rtr = 0,
-            .extended = 0
+    DDRA = 0x00;
+
+    while (1) {
+        state = (PINA & (1 << PD3)) >> PD3;
+        if (state != lastState) {
+            lastState = state;
+            can_wrapper_send(0x08, 1, state);
         }
-    };
-    can_set_filter(0, &filter);
 
-    // Enable interrupts
-    sei();
-	
-	// Create a test message
-	can_t msg;
-	
-	msg.id = 0x123456;
-	msg.flags.rtr = 0;
-	msg.flags.extended = 1;
-	
-	msg.length = 4;
-	msg.data[0] = 0xce;
-	msg.data[1] = 0xad;
-	msg.data[2] = 0xbe;
-	msg.data[3] = 0xef;
-
-    can_send_message({});
-
-    while (1)
-    {
         // Check if a new messag was received
-        if (can_check_message())
-        {
+        if (can_check_message()) {
             can_t msg;
 
             // Try to read the message
-            if (can_get_message(&msg))
-            {
-                // If we received a message resend it with a different id
-                msg.id += 10;
-
-                // Send the new message
+            if (can_get_message(&msg)) {
+                msg.data[0]++;
                 can_send_message(&msg);
             }
         }
-
-
     }
 	
 	return 0;

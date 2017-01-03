@@ -1,6 +1,8 @@
+.dep
 build
 *.eep
 *.elf
+*.lss
 *.hex
 *.map
-.dep
+*.sym
