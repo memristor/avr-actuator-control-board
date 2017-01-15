@@ -6,19 +6,28 @@
 #include "can.h"
 #include "can_wrapper.h"
 
-uint8_t lastState = 0;
-uint8_t state = 0;
+uint8_t lastStateG = 0;
+uint8_t stateG = 0;
+uint8_t lastStateA = 0;
+uint8_t stateA = 0;
 
 int main(void) {
     can_wrapper_init();
 
+    DDRG = 0x00;
     DDRA = 0x00;
 
     while (1) {
-        state = (PINA & (1 << PD3)) >> PD3;
-        if (state != lastState) {
-            lastState = state;
-            can_wrapper_send(0x08, 1, state);
+        stateG = (PING & (1 << PG2)) >> PG2;
+        if (stateG != lastStateG) {
+            lastStateG = stateG;
+            can_wrapper_send(0x08, 1, stateG);
+        }
+
+        stateA = (PINA & (1 << PA7)) >> PA7;
+        if (stateA != lastStateA) {
+            lastStateA = stateA;
+            can_wrapper_send(0x09, 1, stateA);
         }
 
         // Check if a new messag was received
