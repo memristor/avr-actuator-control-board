@@ -80,7 +80,7 @@ OBJDIR = build
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = main.c can_wrapper.c
+SRC = main.c can_wrapper.c BinaryActuator.c BinarySensor.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)

@@ -5,39 +5,42 @@
 #include <util/delay.h>
 #include "can.h"
 #include "can_wrapper.h"
+#include "BinaryActuator.h"
+#include "BinarySensor.h"
 
-uint8_t lastStateG = 0;
-uint8_t stateG = 0;
-uint8_t lastStateA = 0;
-uint8_t stateA = 0;
+// Define number of actuators and sensors
+#define BINARY_ACTUATORS_NUMBER 1
+#define BINARY_SENSORS_NUMBER   2
 
+BinaryActuator binaryActuators[BINARY_ACTUATORS_NUMBER];
+BinarySensor binarySensors[BINARY_SENSORS_NUMBER];
+
+size_t i;
 int main(void) {
     can_wrapper_init();
 
-    DDRG = 0x00;
-    DDRA = 0x00;
+
+    // Insert actuators and sensors here!
+    // Do not forget to update a number of actuators and sensors
+    BinaryActuatorInit(&binaryActuators[0], &DDRB, &PORTB, PB0, 0x01);
+    BinarySensorInit(&binarySensors[0], &DDRG, &PORTG, PG2, 0x02);
+    BinarySensorInit(&binarySensors[1], &DDRA, &PORTA, PA7, 0x03);
+
 
     while (1) {
-        stateG = (PING & (1 << PG2)) >> PG2;
-        if (stateG != lastStateG) {
-            lastStateG = stateG;
-            can_wrapper_send(0x08, 1, stateG);
+        for (i = 0; i < BINARY_SENSORS_NUMBER; i++) {
+            BinarySensorProbe(&binarySensors[i]);
         }
 
-        stateA = (PINA & (1 << PA7)) >> PA7;
-        if (stateA != lastStateA) {
-            lastStateA = stateA;
-            can_wrapper_send(0x09, 1, stateA);
-        }
-
-        // Check if a new messag was received
+        // Check if a new message was received
         if (can_check_message()) {
             can_t msg;
 
             // Try to read the message
             if (can_get_message(&msg)) {
-                msg.data[0]++;
-                can_send_message(&msg);
+                for (i = 0; i < BINARY_ACTUATORS_NUMBER; i++) {
+                    BinaryActuatorProbe(&binaryActuators[i], &msg);
+                }
             }
         }
     }
