@@ -1,6 +1,6 @@
 #include <stdint.h>
-#include "can.h"
-#include "can_wrapper.h"
+#include <can/can.h>
+#include <can/can_wrapper.h>
 #include "Utils.h"
 
 typedef struct _BinarySensor {

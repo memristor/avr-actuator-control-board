@@ -3,8 +3,8 @@
 #include <avr/pgmspace.h>
 #include <stdint.h>
 #include <util/delay.h>
-#include "can.h"
-#include "can_wrapper.h"
+#include <can/can.h>
+#include <can/can_wrapper.h>
 #include "BinaryActuator.h"
 #include "BinarySensor.h"
 

@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include <util/delay.h>
-#include "can.h"
+#include <can/can.h>
 #include "Utils.h"
 
 #define SPI_PORT PORTB
