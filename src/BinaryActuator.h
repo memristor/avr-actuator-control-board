@@ -1,16 +1,24 @@
+#ifndef _BINARY_ACTUATOR_H_
+#define _BINARY_ACTUATOR_H_
+
+// TODO: MCP related functions should be moved to another module. 
+// TODO: Add support for multiple MCPs, ports and IO.
+
 #include <stdint.h>
 #include <avr/io.h>
 #include <util/delay.h>
 #include <can/can.h>
+#include <can/can_wrapper.h>
 #include "Utils.h"
 
+// Reference: http://www.ermicro.com/blog/?p=1050
 #define SPI_PORT PORTB
 #define SPI_DDR  DDRB
-#define SPI_CS   PB2
+#define SPI_CS   PB0
 
 // MCP23S17 SPI Slave Device
 #define SPI_SLAVE_ID    0x40
-#define SPI_SLAVE_ADDR  0x00      // A2=0,A1=0,A0=0
+#define SPI_SLAVE_ADDR  0x07      // A2=0,A1=0,A0=0
 #define SPI_SLAVE_WRITE 0x00
 #define SPI_SLAVE_READ  0x01
 
@@ -38,8 +46,8 @@ enum BinaryActuatorError {
 };
 
 typedef struct _BinaryActuator {
-    volatile uint8_t* port;
-    uint8_t pin;
+    uint8_t port;
+    uint8_t p;
     uint16_t canId;
 } BinaryActuator;
 
@@ -47,12 +55,10 @@ typedef struct _BinaryActuator {
 void BinaryActuatorInitAll(void);
 
 // Reference: http://www.atmel.com/webdoc/AVRLibcReferenceManual/FAQ_1faq_port_pass.html
-extern void BinaryActuatorInit(
-        BinaryActuator* binaryActuator,
-        volatile uint8_t* ddr,
-        volatile uint8_t* port,
-        uint8_t pin,
-        uint16_t canId
-);
+void BinaryActuatorInit(BinaryActuator* binaryActuator, uint8_t port, uint8_t p, uint16_t canId);
 
 extern void BinaryActuatorProbe(BinaryActuator* binaryActuator, can_t* canMsg);
+
+uint8_t MCP1_PORTA_State;
+
+#endif

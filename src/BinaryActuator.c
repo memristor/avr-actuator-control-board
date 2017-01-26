@@ -1,7 +1,6 @@
 #include "BinaryActuator.h"
 
-static void SPI_Write(unsigned char addr,unsigned char data);
-
+static void SPI_Write(unsigned char addr, unsigned char data);
 
 void BinaryActuatorInitAll(void) {
 	// Set MOSI and SCK as output (and SS), others as input
@@ -22,12 +21,10 @@ void BinaryActuatorInitAll(void) {
 	// Initial the MCP23S17 SPI I/O Expander
 	SPI_Write(IOCONA, 0x28);   // I/O Control Register: BANK=0, SEQOP=1, HAEN=1 (Enable Addressing)
 	SPI_Write(IODIRA, 0x00);   // GPIOA As Output
-	SPI_Write(IODIRB, 0xFF);   // GPIOB As Input
-	SPI_Write(GPPUB, 0xFF);    // Enable Pull-up Resistor on GPIOB
-	SPI_Write(GPIOA, 0x00);    // Reset Output on GPIOA
+	SPI_Write(GPIOA, 0x00);    // Enable Pull-up Resistor on GPIOB
 }
 
-void SPI_Write(unsigned char addr,unsigned char data) {
+void SPI_Write(unsigned char addr, unsigned char data) {
 	// Activate the CS pin
 	SPI_PORT &= ~(1<<SPI_CS);
 	
@@ -51,33 +48,28 @@ void SPI_Write(unsigned char addr,unsigned char data) {
 	
 	// CS pin is not active
 	SPI_PORT |= (1<<SPI_CS);
+	
+	// Set initial state 
+	MCP1_PORTA_State = 0xFF;
+	//SPI_Write(GPIOA, MCP1_PORTA_State);
 }
 
-inline void BinaryActuatorInit(
-        BinaryActuator* binaryActuator,
-        volatile uint8_t* ddr,
-        volatile uint8_t* port,
-        uint8_t pin,
-        uint16_t canId
-) {
-	SPI_Write(0x07, 0xff);
-	
-    // Set pin as an output pin
-    SET_BIT(*ddr, pin);
-
-	// Store data abSPI_WriteReadout pins
+void BinaryActuatorInit(BinaryActuator* binaryActuator, uint8_t port, uint8_t p, uint16_t canId) {		
     binaryActuator->port = port;
-    binaryActuator->pin = pin;
+    binaryActuator->p = p;
     binaryActuator->canId = canId;
 }
 
 inline void BinaryActuatorProbe(BinaryActuator* binaryActuator, can_t* canMsg) {
 	// Set HIGH at the pin if 0x01 is sent
     if (unlikely(canMsg->id == binaryActuator->canId)) {
+		// MCP works in inverted logic
         if (canMsg->data[0] == 0x01) {
-            SET_BIT(*(binaryActuator->port), binaryActuator->pin);
+            clear_bit(MCP1_PORTA_State, binaryActuator->p);
         } else {
-            CLEAR_BIT(*(binaryActuator->port), binaryActuator->pin);
+            set_bit(MCP1_PORTA_State, binaryActuator->p);
         }
+        SPI_Write(GPIOA, MCP1_PORTA_State);
+        can_wrapper_send(0x20, 1, 1);
     }
 }

@@ -9,7 +9,7 @@
 #include "BinarySensor.h"
 
 // Define number of actuators and sensors
-#define BINARY_ACTUATORS_NUMBER 1
+#define BINARY_ACTUATORS_NUMBER 2
 #define BINARY_SENSORS_NUMBER   8
 
 BinaryActuator binaryActuators[BINARY_ACTUATORS_NUMBER];
@@ -24,18 +24,17 @@ int main(void) {
     // Insert actuators and sensors here!
     // Do not forget to update a number of actuators and sensors
     BinaryActuatorInitAll();
-    BinaryActuatorInit(&binaryActuators[0], &DDRB, &PINB, PB0, 101);
+    BinaryActuatorInit(&binaryActuators[0], GPIOA, 0, 0x10);
+    BinaryActuatorInit(&binaryActuators[1], GPIOA, 1, 0x11);
 
-	BinarySensorInit(&binarySensors[0], &DDRC, &PINC, PC6, 0x8000);
-	BinarySensorInit(&binarySensors[1], &DDRC, &PINC, PC7, 0x8001); // Doesn't work, check the board
-    BinarySensorInit(&binarySensors[2], &DDRG, &PING, PG2, 0x8002);
-    BinarySensorInit(&binarySensors[3], &DDRA, &PINA, PA7, 0x8003);
-    BinarySensorInit(&binarySensors[4], &DDRA, &PINA, PA6, 0x8004);
-    BinarySensorInit(&binarySensors[5], &DDRA, &PINA, PA5, 0x8005);
-    BinarySensorInit(&binarySensors[6], &DDRA, &PINA, PA4, 0x8006);
-    BinarySensorInit(&binarySensors[7], &DDRA, &PINA, PA3, 0x8007);
-    
-
+	BinarySensorInit(&binarySensors[0], &DDRC, &PORTC, &PINC, PC6, 0x8000);
+	BinarySensorInit(&binarySensors[1], &DDRC, &PORTC, &PINC, PC7, 0x8001); // Doesn't work, check the board
+    BinarySensorInit(&binarySensors[2], &DDRG, &PORTG, &PING, PG2, 0x8002);
+    BinarySensorInit(&binarySensors[3], &DDRA, &PORTA, &PINA, PA7, 0x8003);
+    BinarySensorInit(&binarySensors[4], &DDRA, &PORTA, &PINA, PA6, 0x8004);
+    BinarySensorInit(&binarySensors[5], &DDRA, &PORTA, &PINA, PA5, 0x8005);
+    BinarySensorInit(&binarySensors[6], &DDRA, &PORTA, &PINA, PA4, 0x8006);
+    BinarySensorInit(&binarySensors[7], &DDRA, &PORTA, &PINA, PA3, 0x8007);
 
     while (1) {
         for (i = 0; i < BINARY_SENSORS_NUMBER; i++) {
