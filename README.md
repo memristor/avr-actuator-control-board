@@ -1,10 +1,10 @@
 # Actuator Control Board
 
 ## Cross-compilation
-Install required packages
-```
-apt-get install avr-binutils avr-gcc avr-libc avrdude
-```
+Install required packages  
+- Debian (Ubuntu) `sudo apt-get install binutils-avr gcc-avr avr-libc avrdude`
+- Arch `sudo pacman install avr-binutils avr-gcc avr-libc avrdude`
+
 and run
 ```
 make program
