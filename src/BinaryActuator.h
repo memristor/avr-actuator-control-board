@@ -1,6 +1,11 @@
 #ifndef _BINARY_ACTUATOR_H_
 #define _BINARY_ACTUATOR_H_
 
+#ifndef BINARY_ACTUATOR_CONFIG_MAX
+#define BINARY_ACTUATOR_CONFIG_MAX 10
+#warning "Maximal number of binary actuators is not overriden"
+#endif
+
 // TODO: MCP related functions should be moved to another module. 
 // TODO: Add support for multiple MCPs, ports and IO.
 
@@ -18,7 +23,6 @@
 
 // MCP23S17 SPI Slave Device
 #define SPI_SLAVE_ID    0x40
-#define SPI_SLAVE_ADDR  0x07      // A2=0,A1=0,A0=0
 #define SPI_SLAVE_WRITE 0x00
 #define SPI_SLAVE_READ  0x01
 
@@ -48,17 +52,27 @@ enum BinaryActuatorError {
 typedef struct _BinaryActuator {
     uint8_t port;
     uint8_t p;
+    uint8_t slaveAddress;
     uint16_t canId;
 } BinaryActuator;
 
 
-void BinaryActuatorInitAll(void);
+/**
+ * Initialize binary actuator module. It uses SPI to communicate to MCP and set state for switches. 
+ * @example BinaryActuator_InitAll((uint8_t []) { 0x07, 0x00 }, 2);
+ */
+extern void BinaryActuator_InitAll(const uint8_t* const slaveAddresses, uint8_t count);
 
-// Reference: http://www.atmel.com/webdoc/AVRLibcReferenceManual/FAQ_1faq_port_pass.html
-void BinaryActuatorInit(BinaryActuator* binaryActuator, uint8_t port, uint8_t p, uint16_t canId);
+/**
+ * Add new binary actuator to collection.
+ * @ref http://www.atmel.com/webdoc/AVRLibcReferenceManual/FAQ_1faq_port_pass.html
+ */
+extern uint8_t BinaryActuator_Add(uint8_t slaveAddress, uint8_t port, uint8_t p, uint16_t canId);
 
-extern void BinaryActuatorProbe(BinaryActuator* binaryActuator, can_t* canMsg);
-
-uint8_t MCP1_PORTA_State;
+/**
+ * Try to update state of binary actuators. Call this function on message received.
+ * @example if (can_get_message(&msg)) { BinaryActuator_OnMessage(&msg); }
+ */
+extern void BinaryActuator_OnMessage(const can_t* const canMsg);
 
 #endif

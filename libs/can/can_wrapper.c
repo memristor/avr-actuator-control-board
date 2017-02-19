@@ -17,9 +17,6 @@ uint8_t can_wrapper_init(void) {
     };
     can_set_filter(0, &filter);
 
-    // Enable interrupts
-    sei();
-
     return status;
 }
 

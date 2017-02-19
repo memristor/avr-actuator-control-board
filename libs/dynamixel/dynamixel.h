@@ -4,7 +4,7 @@
 
 #include <avr/io.h>
 
-#define DYNAMIXEL_BAUDRATE 1000000
+#define DYNAMIXEL_BAUDRATE 57600
 
 #define DYNAMIXEL_OK      1
 #define DYNAMIXEL_TIMEOUT 2

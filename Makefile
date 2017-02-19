@@ -80,13 +80,13 @@ OBJDIR = build
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = ./src/main.c ./src/BinaryActuator.c ./src/BinarySensor.c
+SRC = ./src/main.c ./src/BinaryActuator.c ./src/BinarySensor.c ./src/Debugger.c ./src/AX12.c
 
 # Libs here
-SRC += ./libs/can/can_wrapper.c
+SRC += ./libs/can/can_wrapper.c ./libs/dynamixel/dynamixel.c
 
 # Dirs where .o files will be stored
-BUILD_DIRS = ./build/src ./build/libs/can
+BUILD_DIRS = ./build/src ./build/libs/can ./build/libs/dynamixel
 
 
 # List C++ source files here. (C dependencies are automatically generated.)

@@ -9,7 +9,7 @@ volatile uint8_t dynamixel_txpacket[DYNAMIXEL_PACKET_SIZE];
 volatile uint8_t dynamixel_rxpacket[DYNAMIXEL_PACKET_SIZE];
 volatile uint8_t dynamixel_rxindex = 0;
 
-ISR(USART_RX_vect)
+ISR(USART0_RX_vect)
 {
 	dynamixel_rxpacket[dynamixel_rxindex++] = UDR0;
 }
@@ -20,14 +20,15 @@ void dynamixel_init(void)
 	UBRR0H = ((F_CPU / 16 + DYNAMIXEL_BAUDRATE / 2) / DYNAMIXEL_BAUDRATE - 1) >> 8;
 	UBRR0L = ((F_CPU / 16 + DYNAMIXEL_BAUDRATE / 2) / DYNAMIXEL_BAUDRATE - 1);
 	
-	// Enable UART TX, RX, and RX interrupt
+	// Enable receiver and transmitter 
 	UCSR0B |= (1 << TXEN0);
 	UCSR0B |= (1 << RXEN0);
 	UCSR0B |= (1 << RXCIE0);
 	
+	
 	// Set UART direction pins as outputs
-	DDRD |= (1 << PD2);
-	DDRD |= (1 << PD3);
+	DDRE |= (1 << PE0);
+	DDRE |= (1 << PE1);
 	
 	// Reset rx index
 	dynamixel_rxindex = 0;
@@ -36,8 +37,8 @@ void dynamixel_init(void)
 void dynamixel_settx(void)
 {
 	// Set UART direction pins
-	PORTD |= (1 << PD2);
-	PORTD &= ~(1 << PD3);
+	PORTE |= (1 << PE1);
+	PORTE &= ~(1 << PE0);
 	
 	//UCSR0B |= (1 << TXEN0);
 	//UCSR0B &= ~(1 << RXEN0);
@@ -52,8 +53,8 @@ void dynamixel_setrx(void)
 	_delay_us(1);
 	
 	// Set UART direction pins
-	PORTD &= ~(1 << PD2);
-	PORTD |= (1 << PD3);
+	PORTE &= ~(1 << PE1);
+	PORTE |= (1 << PE0);
 	
 	//UCSR0B &= ~(1 << TXEN0);
 	//UCSR0B |= (1 << RXEN0);
