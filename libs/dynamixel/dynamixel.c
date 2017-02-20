@@ -13,6 +13,14 @@ volatile uint8_t dynamixel_rxindex = 0;
 ISR(USART0_RX_vect)
 {
 	dynamixel_rxpacket[dynamixel_rxindex++] = UDR0;
+	
+	// Ignore garbage
+	if (dynamixel_rxindex == 2) {
+		if (dynamixel_rxpacket[dynamixel_rxindex - 1] != 0xFF &&
+			dynamixel_rxpacket[dynamixel_rxindex - 2] != 0xFF) {
+			dynamixel_rxindex = 0;
+		}
+	}
 }
 
 void dynamixel_init(void)
@@ -40,16 +48,14 @@ void dynamixel_settx(void)
 
 
 void dynamixel_setrx(void)
-{
+{	
 	// Wait for TX complete flag before turning the bus around
 	while(bit_is_clear(UCSR0A, TXC0));
 	
-	//_delay_us(10);
-	
 	DDRE &= ~(1 << PE1);		// Set TX as input!
 	UCSR0B &= ~(1 << TXEN0);	// Disable TX
-	UCSR0B |= (1 << RXEN0);		// Enable RX	
 	UCSR0B |= (1 << RXCIE0);	// Enable RX interrupt
+	UCSR0B |= (1 << RXEN0);		// Enable RX	
 	
 	// Reset RX index
 	dynamixel_rxindex = 0;
