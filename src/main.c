@@ -1,6 +1,5 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <avr/pgmspace.h>
 #include <stdint.h>
 #include <util/delay.h>
 #include <can/can.h>
@@ -16,21 +15,20 @@
 
 int main(void) {
 	Debugger_Init();
-	AX12_InitAll(0x233);
+	AX12_InitAll(2000);
 	BinaryActuator_InitAll((uint8_t []) { 0x07, 0x00 }, 2);
     can_wrapper_init();
     
 	// Enable interrupts
     sei();
     
-    
-    
-    _delay_ms(2000);
-    Debugger_SetLED(DEBUGGER_LED1, true);
-    
-    if (true) {
+    if (false) {
+		bool state = true;
+		_delay_ms(2000);
 		dynamixel_writebyte(DYNAMIXEL_BROADCAST_ID, AX_LED, 1);
+		_delay_ms(500);
 		dynamixel_writeword(DYNAMIXEL_BROADCAST_ID, AX_GOAL_SPEED_L, 200);
+		_delay_ms(500);
 		dynamixel_writeword(DYNAMIXEL_BROADCAST_ID, AX_GOAL_POSITION_L, 200);
 	}
 
@@ -59,7 +57,9 @@ int main(void) {
 
             // Try to read the message
             if (can_get_message(&msg)) {
+				Debugger_SetLED(DEBUGGER_LED1, true);
 				BinaryActuator_OnMessage(&msg);
+				AX12_OnMessage(&msg);
             }
         }
     }

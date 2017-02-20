@@ -2,6 +2,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <string.h>
 
 #include "dynamixel.h"
 
@@ -12,6 +13,7 @@ volatile uint8_t dynamixel_rxindex = 0;
 ISR(USART0_RX_vect)
 {
 	dynamixel_rxpacket[dynamixel_rxindex++] = UDR0;
+	can_wrapper_send(1231, 2, 0xdd, dynamixel_rxpacket[dynamixel_rxindex - 1]);
 }
 
 void dynamixel_init(void)
@@ -23,12 +25,12 @@ void dynamixel_init(void)
 	// Enable receiver and transmitter 
 	UCSR0B |= (1 << TXEN0);
 	UCSR0B |= (1 << RXEN0);
-	UCSR0B |= (1 << RXCIE0);
+	//UCSR0B |= (1 << RXCIE0);
 	
 	
 	// Set UART direction pins as outputs
-	DDRE |= (1 << PE0);
-	DDRE |= (1 << PE1);
+	//DDRE |= (1 << PE0);
+	//DDRE |= (1 << PE1);
 	
 	// Reset rx index
 	dynamixel_rxindex = 0;
@@ -37,27 +39,31 @@ void dynamixel_init(void)
 void dynamixel_settx(void)
 {
 	// Set UART direction pins
-	PORTE |= (1 << PE1);
-	PORTE &= ~(1 << PE0);
+	//PORTE |= (1 << PE0);
+	//PORTE &= ~(1 << PE1);
 	
-	//UCSR0B |= (1 << TXEN0);
-	//UCSR0B &= ~(1 << RXEN0);
+	UCSR0B |= (1 << TXEN0);
+	UCSR0B &= ~(1 << RXEN0);
 	//UCSR0B &= ~(1 << RXCIE0);
 }
+
 
 void dynamixel_setrx(void)
 {
 	// Wait for TX complete flag before turning the bus around
 	while(bit_is_clear(UCSR0A, TXC0));
 	
-	_delay_us(1);
+	_delay_us(100);
+	
+	UCSR0A |= (1 << TXC0);
 	
 	// Set UART direction pins
-	PORTE &= ~(1 << PE1);
-	PORTE |= (1 << PE0);
+	//PORTE &= ~(1 << PE0);
+	//PORTE |= (1 << PE1);
 	
-	//UCSR0B &= ~(1 << TXEN0);
+	UCSR0B &= ~(1 << TXEN0);
 	//UCSR0B |= (1 << RXEN0);
+	
 	//UCSR0B |= (1 << RXCIE0);
 	
 	// Reset rx index
@@ -91,12 +97,21 @@ uint8_t dynamixel_writepacket(volatile uint8_t* txpacket, uint8_t packetlength)
 uint8_t dynamixel_readpacket(volatile uint8_t* rxpacket, uint8_t packetlength)
 {
 	uint16_t ulcounter = 0;
+	size_t i;
 
+	can_wrapper_send(1231, 2, 0xcc, 0);
 	while(dynamixel_rxindex < packetlength)
 	{
 		if(ulcounter++ > 10000)
 			return DYNAMIXEL_RX_TIMEOUT;
 	}
+	//can_wrapper_send(1231, 2, 0xcc, 1);
+
+	
+	for (i = 0; i < packetlength; i++) {
+		rxpacket[i] = dynamixel_rxpacket[i];
+	}
+	can_wrapper_send(1231, 2, 0xcc, rxpacket[0]);
 
 	if((rxpacket[0] != 255) || (rxpacket[1] != 255))
 		return DYNAMIXEL_RX_CORRUPT;
@@ -110,12 +125,12 @@ uint8_t dynamixel_readpacket(volatile uint8_t* rxpacket, uint8_t packetlength)
 uint8_t dynamixel_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket)
 {
 	uint8_t rxlength = 0;
-	uint8_t txlength = dynamixel_txpacket[DYNAMIXEL_LENGTH] + 4;
+	uint8_t txlength = txpacket[DYNAMIXEL_LENGTH] + 4;
 	
 	txpacket[0] = (uint8_t) 0xff;
 	txpacket[1] = (uint8_t) 0xff;
 	txpacket[txlength - 1] = (uint8_t) dynamixel_calculatechecksum(txpacket);
-	
+		
 	dynamixel_settx();
 	dynamixel_writepacket(txpacket, txlength);
 	dynamixel_setrx();
@@ -126,7 +141,7 @@ uint8_t dynamixel_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket)
 			rxlength = txpacket[DYNAMIXEL_PARAMETER + 1] + 6;
 		else
 			rxlength = 6;
-			
+
 		return dynamixel_readpacket(rxpacket, rxlength);			
 	}
 	

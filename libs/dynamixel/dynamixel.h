@@ -3,6 +3,7 @@
 #define _DYNAMIXEL_H_
 
 #include <avr/io.h>
+#include <can/can_wrapper.h>
 
 #define DYNAMIXEL_BAUDRATE 57600
 
