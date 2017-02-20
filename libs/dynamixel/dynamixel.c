@@ -13,7 +13,6 @@ volatile uint8_t dynamixel_rxindex = 0;
 ISR(USART0_RX_vect)
 {
 	dynamixel_rxpacket[dynamixel_rxindex++] = UDR0;
-	can_wrapper_send(1231, 2, 0xdd, dynamixel_rxpacket[dynamixel_rxindex - 1]);
 }
 
 void dynamixel_init(void)
@@ -25,12 +24,7 @@ void dynamixel_init(void)
 	// Enable receiver and transmitter 
 	UCSR0B |= (1 << TXEN0);
 	UCSR0B |= (1 << RXEN0);
-	//UCSR0B |= (1 << RXCIE0);
-	
-	
-	// Set UART direction pins as outputs
-	//DDRE |= (1 << PE0);
-	//DDRE |= (1 << PE1);
+	UCSR0B |= (1 << RXCIE0);
 	
 	// Reset rx index
 	dynamixel_rxindex = 0;
@@ -38,13 +32,10 @@ void dynamixel_init(void)
 
 void dynamixel_settx(void)
 {
-	// Set UART direction pins
-	//PORTE |= (1 << PE0);
-	//PORTE &= ~(1 << PE1);
-	
-	UCSR0B |= (1 << TXEN0);
-	UCSR0B &= ~(1 << RXEN0);
-	//UCSR0B &= ~(1 << RXCIE0);
+	DDRE |= (1 << PE1);			// Set TX as output
+	UCSR0B |= (1 << TXEN0);		// Enable TX
+	UCSR0B &= ~(1 << RXEN0);	// Disable RX	
+	UCSR0B &= ~(1 << RXCIE0);	// Disable RX interrupt
 }
 
 
@@ -53,20 +44,14 @@ void dynamixel_setrx(void)
 	// Wait for TX complete flag before turning the bus around
 	while(bit_is_clear(UCSR0A, TXC0));
 	
-	_delay_us(100);
+	//_delay_us(10);
 	
-	UCSR0A |= (1 << TXC0);
+	DDRE &= ~(1 << PE1);		// Set TX as input!
+	UCSR0B &= ~(1 << TXEN0);	// Disable TX
+	UCSR0B |= (1 << RXEN0);		// Enable RX	
+	UCSR0B |= (1 << RXCIE0);	// Enable RX interrupt
 	
-	// Set UART direction pins
-	//PORTE &= ~(1 << PE0);
-	//PORTE |= (1 << PE1);
-	
-	UCSR0B &= ~(1 << TXEN0);
-	//UCSR0B |= (1 << RXEN0);
-	
-	//UCSR0B |= (1 << RXCIE0);
-	
-	// Reset rx index
+	// Reset RX index
 	dynamixel_rxindex = 0;
 }
 
@@ -99,26 +84,26 @@ uint8_t dynamixel_readpacket(volatile uint8_t* rxpacket, uint8_t packetlength)
 	uint16_t ulcounter = 0;
 	size_t i;
 
-	can_wrapper_send(1231, 2, 0xcc, 0);
 	while(dynamixel_rxindex < packetlength)
 	{
-		if(ulcounter++ > 10000)
+		if(ulcounter++ > (DYNAMIXEL_TIMEOUT_MS) * 10) {
 			return DYNAMIXEL_RX_TIMEOUT;
+		}
+		_delay_us(100);
 	}
-	//can_wrapper_send(1231, 2, 0xcc, 1);
 
-	
+	// Copy received packet to `rxpacket`
 	for (i = 0; i < packetlength; i++) {
 		rxpacket[i] = dynamixel_rxpacket[i];
 	}
-	can_wrapper_send(1231, 2, 0xcc, rxpacket[0]);
-
-	if((rxpacket[0] != 255) || (rxpacket[1] != 255))
+	
+	// Check if packet is corrupted
+	if((dynamixel_rxpacket[0] != 255) || (dynamixel_rxpacket[1] != 255))
 		return DYNAMIXEL_RX_CORRUPT;
 		
-	if(rxpacket[packetlength - 1] != dynamixel_calculatechecksum(rxpacket))
+	if(dynamixel_rxpacket[packetlength - 1] != dynamixel_calculatechecksum(rxpacket))
 		return DYNAMIXEL_RX_CORRUPT;
-
+	
 	return DYNAMIXEL_SUCCESS;
 }
 

@@ -33,6 +33,11 @@
 #define DYNAMIXEL_TX_FAIL     4
 #define DYNAMIXEL_TX_TIMEOUT  5
 
+#ifndef DYNAMIXEL_TIMEOUT_MS
+// Timeout in milliseconds
+#define DYNAMIXEL_TIMEOUT_MS 50
+#endif
+
 void dynamixel_init(void);
 void dynamixel_settx(void);
 void dynamixel_setrx(void);

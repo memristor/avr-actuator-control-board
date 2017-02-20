@@ -22,6 +22,7 @@ int main(void) {
 	// Enable interrupts
     sei();
     
+    
     if (false) {
 		bool state = true;
 		_delay_ms(2000);
@@ -57,7 +58,6 @@ int main(void) {
 
             // Try to read the message
             if (can_get_message(&msg)) {
-				Debugger_SetLED(DEBUGGER_LED1, true);
 				BinaryActuator_OnMessage(&msg);
 				AX12_OnMessage(&msg);
             }
