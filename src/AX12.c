@@ -1,11 +1,45 @@
 #include "AX12.h"
 
+#include <math.h>
 #include <string.h>
 #include <dynamixel/ax.h>
 #include <dynamixel/dynamixel.h>
 #include "Utils.h"
 
 static uint16_t CAN_ID;
+static uint64_t lastUpdate = 0;
+		
+// Should be imported to custom structure to do not check all AX12 in loop
+static AX12 positionUpdateQueue[AX12_CONFIG_QUEUE_MAX];
+static uint8_t positionUpdateQueueCount = 0;
+	
+static size_t i;
+	
+void AX12_UpdateAll(void) {
+	for (i = 0; i < positionUpdateQueueCount; i++) {
+		// If disabled do not check anything. `0` means don't check!
+		if (likely(positionUpdateQueue[i].updatePeriodMs == 0)) {
+			continue;
+		}
+		
+		if (Utils_Mills() > positionUpdateQueue[i].lastUpdate + positionUpdateQueue[i].updatePeriodMs) {
+			uint8_t status;
+			uint16_t value
+			
+			positionUpdateQueue[i].lastUpdate = Utils_Mills();
+			
+			status = dynamixel_readword(
+				positionUpdateQueue[i].id, 
+				AX_PRESENT_POSITION_L, 
+				&value
+			);
+			
+			if (abs(value - positionUpdateQueue[i].requiredPosition) <= positionUpdateQueue[i].tolerance) {
+				// TODO: Send response
+			}
+		}
+	}
+}
 
 void AX12_InitAll(uint16_t canId) {
 	dynamixel_init();

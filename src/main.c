@@ -8,32 +8,20 @@
 #include "BinarySensor.h"
 #include "AX12.h"
 #include "Debugger.h"
+#include "Utils.h"
 
 #include <dynamixel/ax.h>
 #include <dynamixel/dynamixel.h>
 
-
 int main(void) {
 	Debugger_Init();
+	Utils_Init();
 	AX12_InitAll(2000);
 	BinaryActuator_InitAll((uint8_t []) { 0x07, 0x00 }, 2);
     can_wrapper_init();
     
 	// Enable interrupts
     sei();
-    
-    
-    if (false) {
-		bool state = true;
-		_delay_ms(2000);
-		dynamixel_writebyte(DYNAMIXEL_BROADCAST_ID, AX_LED, 1);
-		_delay_ms(500);
-		dynamixel_writeword(DYNAMIXEL_BROADCAST_ID, AX_GOAL_SPEED_L, 200);
-		_delay_ms(500);
-		dynamixel_writeword(DYNAMIXEL_BROADCAST_ID, AX_GOAL_POSITION_L, 200);
-	}
-
-	
 
     // Binary actuators
     (void)BinaryActuator_Add(0x07, GPIOA, 0, 0x10);
@@ -49,7 +37,9 @@ int main(void) {
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA4, 0x8006);
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA3, 0x8007);
 
+
     while (1) {
+		// AX12_UpdateAll();
 		BinarySensor_UpdateAll();
 
         // Check if a new message was received
