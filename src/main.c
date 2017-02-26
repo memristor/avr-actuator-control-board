@@ -9,6 +9,7 @@
 #include "Debugger.h"
 #include "Utils.h"
 #include "MCP.h"
+#include "FastPWM.h"
 
 #include <dynamixel/ax.h>
 #include <dynamixel/dynamixel.h>
@@ -52,6 +53,9 @@ int main(void) {
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA4, 0x8006);
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA3, 0x8007);
 
+	// PWMs
+	(void)FastPWM_Add(&TCCR0A, &OCR0A, &DDRB, PB7, 3000);
+	
 
     while (1) {
 		// AX12_UpdateAll();
@@ -63,10 +67,10 @@ int main(void) {
 
             // Try to read the message
             if (can_get_message(&msg)) {
-				can_send_message(&msg);
 				MCP_OnMessage(&mcpFirstRow, &msg);
 				MCP_OnMessage(&mcpSecondRow, &msg);
 				AX12_OnMessage(&msg);
+				FastPWM_OnMessage(&msg);
             }
         }
     }
