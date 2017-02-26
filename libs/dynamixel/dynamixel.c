@@ -34,6 +34,9 @@ void dynamixel_init(void)
 	UCSR0B |= (1 << RXEN0);
 	UCSR0B |= (1 << RXCIE0);
 	
+	DDRE |= (1 << PE0);
+	DDRE |= (1 << PE1);
+	
 	// Reset rx index
 	dynamixel_rxindex = 0;
 }
@@ -41,6 +44,8 @@ void dynamixel_init(void)
 void dynamixel_settx(void)
 {
 	DDRE |= (1 << PE1);			// Set TX as output
+	DDRE &= ~(1 << PE0);		// Set RX as input
+	
 	UCSR0B |= (1 << TXEN0);		// Enable TX
 	UCSR0B &= ~(1 << RXEN0);	// Disable RX	
 	UCSR0B &= ~(1 << RXCIE0);	// Disable RX interrupt
@@ -53,6 +58,8 @@ void dynamixel_setrx(void)
 	while(bit_is_clear(UCSR0A, TXC0));
 	
 	DDRE &= ~(1 << PE1);		// Set TX as input!
+	DDRE |= (1 << PE0);			// Set RX as output
+	
 	UCSR0B &= ~(1 << TXEN0);	// Disable TX
 	UCSR0B |= (1 << RXCIE0);	// Enable RX interrupt
 	UCSR0B |= (1 << RXEN0);		// Enable RX	

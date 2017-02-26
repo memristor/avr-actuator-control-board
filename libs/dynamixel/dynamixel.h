@@ -5,7 +5,7 @@
 #include <avr/io.h>
 #include <can/can_wrapper.h>
 
-#define DYNAMIXEL_BAUDRATE 57600
+#define DYNAMIXEL_BAUDRATE 57143
 
 #define DYNAMIXEL_OK      1
 #define DYNAMIXEL_TIMEOUT 2

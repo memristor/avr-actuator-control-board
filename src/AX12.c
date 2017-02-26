@@ -1,6 +1,7 @@
 #include "AX12.h"
 
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 #include <dynamixel/ax.h>
 #include <dynamixel/dynamixel.h>
@@ -24,7 +25,7 @@ void AX12_UpdateAll(void) {
 		
 		if (Utils_Mills() > positionUpdateQueue[i].lastUpdate + positionUpdateQueue[i].updatePeriodMs) {
 			uint8_t status;
-			uint16_t value
+			uint16_t value;
 			
 			positionUpdateQueue[i].lastUpdate = Utils_Mills();
 			

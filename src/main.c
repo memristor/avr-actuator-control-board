@@ -4,29 +4,44 @@
 #include <util/delay.h>
 #include <can/can.h>
 #include <can/can_wrapper.h>
-#include "BinaryActuator.h"
 #include "BinarySensor.h"
 #include "AX12.h"
 #include "Debugger.h"
 #include "Utils.h"
+#include "MCP.h"
 
 #include <dynamixel/ax.h>
 #include <dynamixel/dynamixel.h>
 
 int main(void) {
-	Debugger_Init();
 	Utils_Init();
+	Debugger_Init();
+	
+	can_wrapper_init();
 	AX12_InitAll(2000);
-	BinaryActuator_InitAll((uint8_t []) { 0x07, 0x00 }, 2);
-    can_wrapper_init();
-    
+	
+	MCP mcpFirstRow;
+	MCP_Init(&mcpFirstRow, 0x07, &PORTB, &DDRB, PB0);
+	
+	MCP mcpSecondRow;
+	MCP_Init(&mcpSecondRow, 0x00, &PORTB, &DDRB, PB0);
+
 	// Enable interrupts
     sei();
 
     // Binary actuators
-    (void)BinaryActuator_Add(0x07, GPIOA, 0, 0x10);
-    (void)BinaryActuator_Add(0x07, GPIOA, 1, 0x11);
-
+    (void)MCP_AddActuator(&mcpFirstRow, GPIOA, 0, 1000);
+	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 1, 1001);
+	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 2, 1002);
+	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 3, 1003);
+	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 4, 1004);
+	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 5, 1005);
+	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 6, 1006);
+	
+	(void)MCP_AddActuator(&mcpSecondRow, GPIOB, 4, 1014);
+	(void)MCP_AddActuator(&mcpSecondRow, GPIOB, 5, 1015);
+	(void)MCP_AddActuator(&mcpSecondRow, GPIOB, 6, 1016);
+    
 	// Binary sensors
 	(void)BinarySensor_Add(&DDRC, &PORTC, &PINC, PC6, 0x8000);
 	(void)BinarySensor_Add(&DDRC, &PORTC, &PINC, PC7, 0x8001); // Doesn't work, check the board
@@ -48,7 +63,9 @@ int main(void) {
 
             // Try to read the message
             if (can_get_message(&msg)) {
-				BinaryActuator_OnMessage(&msg);
+				can_send_message(&msg);
+				MCP_OnMessage(&mcpFirstRow, &msg);
+				MCP_OnMessage(&mcpSecondRow, &msg);
 				AX12_OnMessage(&msg);
             }
         }

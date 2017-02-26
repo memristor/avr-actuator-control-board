@@ -1,24 +1,28 @@
 #include "MCP.h"
+#include "Utils.h"
+#include <util/delay.h>
 
+static void SPI_Write(MCP* mcp, uint8_t port, uint8_t data);
+static uint8_t SPI_Read(MCP* mcp, uint8_t port);
 
-static MCPSensor sensors[MCP_CONFIG_SENSOR_MAX];
-static MCPActuator actuators[MCP_CONFIG_ACTUATOR_MAX];
-static uint8_t sensorsCount = 0;
-static uint8_t actuatorsCount = 0;
-
-//static uint8_t portState[MCP_CONFIG_MAX][2];
-
-static void SPI_Write(unsigned char slaveAddress, unsigned char port, unsigned char data);
-static unsigned char SPI_Read(unsigned char slaveAddress, unsigned char port);
-
-void MCP_InitAll(MCP* mcp, volatile uint8_t* port, volatile uint8_t* ddr, uint8_t cs) {
-	size_t i;
+void MCP_Init(MCP* mcp, uint8_t slaveAddress, volatile uint8_t* port, volatile uint8_t* ddr, uint8_t cs) {
+	mcp->sensorsCount = 0;
+	mcp->actuatorsCount = 0;
+	mcp->ddrA = 0x00;	// GPIOA As Output
+	mcp->ddrB = 0x00;
+	mcp->stateA = 0xff;	// Set LOW as default
+	mcp->stateB = 0xff;
+	
+	mcp->port = port;
+	mcp->ddr = ddr;
+	mcp->cs = cs;
+	mcp->slaveAddress = slaveAddress;
 	
 	// Set MOSI and SCK as output (and SS), others as input
-	SPI_DDR = (1<<PB2)|(1<<PB1)|(1<<PB0);
+	*ddr = (1<<PB2)|(1<<PB1)|(1<<PB0);
 	
 	// CS pin is not active
-	SPI_PORT |= (1<<SPI_CS);
+	*port |= (1 << cs);
 	
 	#if MCP23S17_EMULATION
 		// Enable SPI, Master, set clock rate fck/64
@@ -29,56 +33,67 @@ void MCP_InitAll(MCP* mcp, volatile uint8_t* port, volatile uint8_t* ddr, uint8_
 		SPSR |= (1<<SPI2X);
 	#endif
 	
-	// Initial the MCP23S17 SPI I/O Expanders
-	for (i = 0; i < count; i++) {
-		Debugger_SetLED(DEBUGGER_LED2, true);
-		SPI_Write(slaveAddresses[i], IOCONA, 0x28);   // I/O Control Register: BANK=0, SEQOP=1, HAEN=1 (Enable Addressing)
-	}
+	// Initial the MCP23S17 SPI I/O Expander
+	// I/O Control Register: BANK=0, SEQOP=1, HAEN=1 (Enable Addressing)
+	SPI_Write(mcp, IOCONA, 0x28);
+	SPI_Write(mcp, IODIRA, mcp->ddrA);   
+	SPI_Write(mcp, GPIOA, mcp->stateA);    
+	SPI_Write(mcp, IODIRB, mcp->ddrB);   
+	SPI_Write(mcp, GPIOB, mcp->stateB); 
 }
 
-uint8_t MCP_AddActuator(uint8_t slaveAddress, uint8_t port, uint8_t p, uint16_t canId) {	
-	uint8_t index = actuatorsCount;
+uint8_t MCP_AddActuator(MCP* mcp, uint8_t port, uint8_t p, uint16_t canId) {	
+	uint8_t index = mcp->actuatorsCount;
 		
 	// Save properties
-    actuators[index].port = port;
-    actuators[index].slaveAddress = slaveAddress;
-    actuators[index].p = p;
-    actuators[index].canId = canId;
+    mcp->actuators[index].port = port;
+    mcp->actuators[index].p = p;
+    mcp->actuators[index].canId = canId;
     
     // Initialize pins
     if (port == GPIOA) {
-		SPI_Write(slaveAddress, IODIRA, 0x00);   // Set as Output
-		SPI_Write(slaveAddress, GPIOA, 0xFF);    // Set default value to high
+		clear_bit(mcp->ddrA, p);
+		set_bit(mcp->stateA, p);
+		
+		SPI_Write(mcp, IODIRA, mcp->ddrA);   // Set as Output
+		SPI_Write(mcp, GPIOA, mcp->stateA);  // Set default value to high
+	} else {
+		clear_bit(mcp->ddrB, p); // Set as Output
+		set_bit(mcp->stateB, p); // Set default value to high
+		
+		SPI_Write(mcp, IODIRB, mcp->ddrB);   
+		SPI_Write(mcp, GPIOB, mcp->stateB);  
 	}
     
-    instancesCount++;
+    (mcp->actuatorsCount)++;
     return index;
 }
 
-inline void BinaryActuator_OnMessage(const can_t* const canMsg) {
+void MCP_OnMessage(MCP* mcp, const can_t* const canMsg) {
 	size_t i;
-	for (i = 0; i < instancesCount; i++) {
-		
+	
+	for (i = 0; i < mcp->actuatorsCount; i++) {
 		// Set HIGH at the pin if 0x01 is sent
-		if (unlikely(canMsg->id == instaces[i].canId)) {
+		if (unlikely(canMsg->id == mcp->actuators[i].canId)) {
+			uint8_t* currentPortState = (mcp->actuators[i].port == GPIOA) ? &(mcp->stateA) : &(mcp->stateB);
+			
 			// MCP works in inverted logic
 			if (canMsg->data[0] == 0x01) {
-				clear_bit(MCP1_PORTA_State, instaces[i].p);
+				clear_bit((*currentPortState), mcp->actuators[i].p);
 			} else {
-				set_bit(MCP1_PORTA_State, instaces[i].p);
+				set_bit((*currentPortState), mcp->actuators[i].p);
 			}
-			SPI_Write(instaces[i].slaveAddress, GPIOA, MCP1_PORTA_State);
+			SPI_Write(mcp, mcp->actuators[i].port, (*currentPortState));
 		}
 	}
-}
+}	
 
-
-void SPI_Write(unsigned char slaveAddress, unsigned char port, unsigned char data) {
+void SPI_Write(MCP* mcp, uint8_t port, uint8_t data) {
 	// Activate the CS pin
-	SPI_PORT &= ~(1<<SPI_CS);
+	*(mcp->port) &= ~(1 << (mcp->cs));
 	
 	// Start MCP23S17 OpCode transmission
-	SPDR = SPI_SLAVE_ID | ((slaveAddress << 1) & 0x0E)| SPI_SLAVE_WRITE;
+	SPDR = SPI_SLAVE_ID | ((mcp->slaveAddress << 1) & 0x0E) | SPI_SLAVE_WRITE;
 	
 	// Wait for transmission complete
 	while(!(SPSR & (1<<SPIF)));
@@ -96,19 +111,18 @@ void SPI_Write(unsigned char slaveAddress, unsigned char port, unsigned char dat
 	while(!(SPSR & (1<<SPIF)));
 	
 	// CS pin is not active
-	SPI_PORT |= (1<<SPI_CS);
+	*(mcp->port) |= (1 << (mcp->cs));
 	
 	// Set initial state 
-	MCP1_PORTA_State = 0xFF;
+	//MCP1_PORTA_State = 0xFF;
 	//SPI_Write(GPIOA, MCP1_PORTA_State);
 }
 
-unsigned char SPI_Read(unsigned char slaveAddress, unsigned char port)
-{
+uint8_t SPI_Read(MCP* mcp, uint8_t port) {
 	// Activate the CS pin
-	SPI_PORT &= ~(1<<SPI_CS);
+	*(mcp->port) &= ~(1 << mcp->cs);
 	// Start MCP23S17 OpCode transmission
-	SPDR = SPI_SLAVE_ID | ((slaveAddress << 1) & 0x0E)| SPI_SLAVE_READ;
+	SPDR = SPI_SLAVE_ID | ((mcp->slaveAddress << 1) & 0x0E)| SPI_SLAVE_READ;
 	// Wait for transmission complete
 	while(!(SPSR & (1<<SPIF)));
 	#if MCP23S17_EMULATION
@@ -117,7 +131,7 @@ unsigned char SPI_Read(unsigned char slaveAddress, unsigned char port)
 	// Start MCP23S17 Address transmission
 	SPDR = port;
 	// Wait for transmission complete
-	while(!(SPSR & (1<<SPIF)));  
+	while(!(SPSR & (1<<SPIF)));
 
 	#if MCP23S17_EMULATION
 	_delay_us(1);
@@ -128,6 +142,6 @@ unsigned char SPI_Read(unsigned char slaveAddress, unsigned char port)
 	while(!(SPSR & (1<<SPIF)));  
 
 	// CS pin is not active
-	SPI_PORT |= (1<<SPI_CS);
+	*(mcp->port) |= (1 << mcp->cs);
 	return(SPDR);
 }

@@ -1,4 +1,4 @@
-// coding: utf-8
+// Full code is available at: https://github.com/dergraaf/avr-can-lib
 // ----------------------------------------------------------------------------
 /*
  * Copyright (c) 2007 Fabian Greif, Roboterclub Aachen e.V.

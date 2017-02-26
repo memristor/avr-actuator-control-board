@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <can/can.h>
+#include "Debugger.h"
 
 #ifndef MCP_CONFIG_SENSOR_MAX
 #define MCP_CONFIG_SENSOR_MAX 5
@@ -47,47 +48,52 @@
 typedef struct _MCPSensor {
     uint8_t port;
     uint8_t p;
-    uint8_t slaveAddress;
     uint16_t canId;
 } MCPSensor;
 
 typedef struct _MCPActuator {
     uint8_t port;
     uint8_t p;
-    uint8_t slaveAddress;
     uint16_t canId;
 } MCPActuator;
 
 typedef struct _MCP { 
-	uint8_t* port;	// PORTB
-	uint8_t* ddr;	// DDRB
+	volatile uint8_t* port;	// PORTB
+	volatile uint8_t* ddr;	// DDRB
 	uint8_t cs;		// PB0
-	MCPActuator actuators[10];
-	MCPSensor sensors[10];
+	uint8_t slaveAddress;
+	MCPActuator actuators[MCP_CONFIG_ACTUATOR_MAX];
+	MCPSensor sensors[MCP_CONFIG_SENSOR_MAX];
+	uint8_t sensorsCount;
+	uint8_t actuatorsCount;
+	uint8_t ddrA;
+	uint8_t ddrB;
+	uint8_t stateA;
+	uint8_t stateB;
 } MCP;
 
 /**
  * Initialize binary actuator module. It uses SPI to communicate to MCP and set state for switches. 
- * @example MCP_InitAll((uint8_t []) { 0x07, 0x00 }, 2);
+ * @example MCP_Init(&mcp, 0x00, &PORTB, &DDRB, PB0);
  */
-extern void MCP_Init(MCP* mcp, volatile uint8_t* port, volatile uint8_t* ddr, uint8_t cs);
+extern void MCP_Init(MCP* mcp, uint8_t slaveAddress, volatile uint8_t* port, volatile uint8_t* ddr, uint8_t cs);
 
 /**
  * Add new binary actuator to collection.
  * @ref http://www.atmel.com/webdoc/AVRLibcReferenceManual/FAQ_1faq_port_pass.html
  */
-extern void MCP_AddActuator(uint8_t slaveAddress, uint8_t port, uint8_t p, uint16_t canId);
+extern uint8_t MCP_AddActuator(MCP* mcp, uint8_t port, uint8_t p, uint16_t canId);
 
-extern void MCP_AddSensor(uint8_t slaveAddress, uint8_t port, uint8_t p, uint16_t canId);
+extern uint8_t MCP_AddSensor(MCP* mcp, uint8_t port, uint8_t p, uint16_t canId);
 
 /**
  * Try to update state of binary actuators. Call this function on message received.
  * @example if (can_get_message(&msg)) { MCP_OnMessage(&msg); }
  */
-extern void MCP_OnMessage(const can_t* const canMsg);
+extern void MCP_OnMessage(MCP* mcp, const can_t* const canMsg);
 
 /**
- * Call this function in a main loop only if you have sensors.
+ * Call this function in a main loop only if you have at least one sensor.
  */
 extern void MCP_UpdateAll(void);
 
