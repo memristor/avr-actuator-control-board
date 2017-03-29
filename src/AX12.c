@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dynamixel/ax.h>
+#include <can/can_wrapper.h>
 #include <dynamixel/dynamixel.h>
 #include "Utils.h"
 
@@ -29,11 +29,13 @@ void AX12_UpdateAll(void) {
 			
 			positionUpdateQueue[i].lastUpdate = Utils_Mills();
 			
+			/*
 			status = dynamixel_readword(
 				positionUpdateQueue[i].id, 
 				AX_PRESENT_POSITION_L, 
 				&value
 			);
+			*/
 			
 			if (abs(value - positionUpdateQueue[i].requiredPosition) <= positionUpdateQueue[i].tolerance) {
 				// TODO: Send response
@@ -43,7 +45,7 @@ void AX12_UpdateAll(void) {
 }
 
 void AX12_InitAll(uint16_t canId) {
-	dynamixel_init();
+	dynamixel_ax_init();
 	CAN_ID = canId;
 }
 
@@ -55,7 +57,7 @@ void AX12_OnMessage(can_t* canMsg) {
 		
 		// Send packet to AX12 (Brain -> AX12)
 		memcpy(txpacket + 2, canMsg->data, canMsg->length);
-		status = dynamixel_txrx(txpacket, rxpacket);
+		status = dynamixel_ax_txrx(txpacket, rxpacket);
 		
 		// Get a response from AX12 (Brain <- AX12)
 		can_t msg;

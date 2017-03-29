@@ -10,9 +10,7 @@
 #include "Utils.h"
 #include "MCP.h"
 #include "FastPWM.h"
-
-#include <dynamixel/ax.h>
-#include <dynamixel/dynamixel.h>
+#include "RX24.h"
 
 int main(void) {
 	Utils_Init();
@@ -20,6 +18,9 @@ int main(void) {
 	
 	can_wrapper_init();
 	AX12_InitAll(2000);
+	RX24_InitAll(2001);
+	
+	can_wrapper_send(7000, 1, 1);
 	
 	MCP mcpFirstRow;
 	MCP_Init(&mcpFirstRow, 0x07, &PORTB, &DDRB, PB0);
@@ -70,6 +71,7 @@ int main(void) {
 				MCP_OnMessage(&mcpFirstRow, &msg);
 				MCP_OnMessage(&mcpSecondRow, &msg);
 				AX12_OnMessage(&msg);
+				RX24_OnMessage(&msg);
 				FastPWM_OnMessage(&msg);
             }
         }
