@@ -54,6 +54,7 @@ void AX12_OnMessage(can_t* canMsg) {
 		uint8_t txpacket[11];
 		uint8_t rxpacket[11];
 		uint8_t status;
+		uint8_t packetKernelLength;
 		
 		// Send packet to AX12 (Brain -> AX12)
 		memcpy(txpacket + 2, canMsg->data, canMsg->length);
@@ -64,13 +65,14 @@ void AX12_OnMessage(can_t* canMsg) {
 		msg.id = CAN_ID;
 		msg.flags.rtr = 0;
 		msg.flags.extended = 1;
-		uint8_t packetKernelLength;
 		if (status == DYNAMIXEL_SUCCESS) {
-			packetKernelLength = rxpacket[3] + 2 - 1; // Length + (1 Byte ID) + (1 Byte Lenght) - (1 Byte Checksum)
+			// Length + (1 Byte ID) + (1 Byte Lenght) - (1 Byte Checksum)
+			packetKernelLength = rxpacket[3] + 2 - 1; 
 			memcpy(msg.data, rxpacket + 2, packetKernelLength);
 		} else {
-			packetKernelLength = 1;
-			msg.data[0] = status;
+			packetKernelLength = 2;
+			msg.data[0] = canMsg->data[0]; // ID
+			msg.data[1] = status;
 		}		
 		msg.length = packetKernelLength;
 		can_send_message(&msg);

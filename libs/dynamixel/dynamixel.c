@@ -26,10 +26,13 @@ static volatile uint8_t rx_buffer[DYNAMIXEL_PACKET_SIZE];
 static volatile uint8_t rx_buffer_index = 0;
 static void rx_write(uint8_t c);
 
+static uint8_t retry_count = 0;
 
 
 ISR(USART0_RX_vect) {
-	ax_buffer[ax_buffer_index] = UDR0;
+	uint8_t data = UDR0;
+	
+	ax_buffer[ax_buffer_index] = data;
 	if (ax_buffer_index < DYNAMIXEL_PACKET_SIZE - 1) {
 		ax_buffer_index++;
 	}
@@ -37,6 +40,12 @@ ISR(USART0_RX_vect) {
 	// Ignore garbage
 	if (ax_buffer_index == 1 && ax_buffer[0] != 0xFF) {
 		ax_buffer_index = 0;
+	}
+	if (ax_buffer_index == 3 && 
+		ax_buffer[0] == 0xFF && 
+		ax_buffer[1] == 0xFF && 
+		ax_buffer[2] == 0xFF) {
+		ax_buffer_index = 2;
 	}
 }
 
@@ -86,12 +95,14 @@ void dynamixel_rx_init(void) {
 }
 
 void ax_settx(void) {
+	UCSR0B &= ~(1 << RXEN0);	// Disable RX
+	
 	DDRE |= (1 << PE1);			// Set TX as output
 	DDRE &= ~(1 << PE0);		// Set RX as input
 	
 	UCSR0B |= (1 << TXEN0);		// Enable TX
-	UCSR0B &= ~(1 << RXEN0);	// Disable RX	
-	UCSR0B &= ~(1 << RXCIE0);	// Disable RX interrupt
+		
+	//UCSR0B &= ~(1 << RXCIE0);	// Disable RX interrupt
 }
 
 
@@ -99,15 +110,14 @@ void ax_setrx(void) {
 	// Wait for TX complete flag before turning the bus around
 	while(bit_is_clear(UCSR0A, TXC0));
 	
+	ax_buffer_index = 0;		// Reset RX index
+	
 	DDRE &= ~(1 << PE1);		// Set TX as input!
 	DDRE |= (1 << PE0);			// Set RX as output
 	
 	UCSR0B &= ~(1 << TXEN0);	// Disable TX
-	UCSR0B |= (1 << RXCIE0);	// Enable RX interrupt
+	//UCSR0B |= (1 << RXCIE0);	// Enable RX interrupt
 	UCSR0B |= (1 << RXEN0);		// Enable RX	
-	
-	// Reset RX index
-	ax_buffer_index = 0;
 }
 
 void ax_write(uint8_t c) {
@@ -150,7 +160,7 @@ uint8_t readpacket(
 	for (i = 0; i < packetlength; i++) {
 		rxpacket[i] = recv_buffer[i];
 	}
-	
+
 	// Check if packet is corrupted
 	if((rxpacket[0] != 255) || (rxpacket[1] != 255)) {
 		return DYNAMIXEL_RX_CORRUPT;
@@ -166,6 +176,7 @@ uint8_t readpacket(
 uint8_t dynamixel_ax_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket) {
 	uint8_t rxlength = 0;
 	uint8_t txlength = txpacket[DYNAMIXEL_LENGTH] + 4;
+	uint8_t status;
 	
 	txpacket[0] = (uint8_t) 0xff;
 	txpacket[1] = (uint8_t) 0xff;
@@ -187,9 +198,15 @@ uint8_t dynamixel_ax_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket
 		else {
 			rxlength = 6;
 		}
-		return readpacket(rxpacket, rxlength, ax_buffer, &ax_buffer_index);
+		
+		status = readpacket(rxpacket, rxlength, ax_buffer, &ax_buffer_index);
+		if (status != DYNAMIXEL_SUCCESS && (retry_count++) < DYNAMIXEL_RETRY_COUNT) {
+			dynamixel_rx_txrx(txpacket, rxpacket);
+		} else {
+			retry_count = 0;
+			return status;
+		}
 	}
-	ax_settx();
 		
 	return DYNAMIXEL_SUCCESS;
 }

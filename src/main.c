@@ -30,6 +30,7 @@ int main(void) {
 
 	// Enable interrupts
     sei();
+    
 
     // Binary actuators
     (void)MCP_AddActuator(&mcpFirstRow, GPIOA, 0, 1000);
@@ -44,6 +45,8 @@ int main(void) {
 	(void)MCP_AddActuator(&mcpSecondRow, GPIOB, 5, 1015);
 	(void)MCP_AddActuator(&mcpSecondRow, GPIOB, 6, 1016);
     
+	(void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA2, 0x8008);
+    
 	// Binary sensors
 	(void)BinarySensor_Add(&DDRC, &PORTC, &PINC, PC6, 0x8000);
 	(void)BinarySensor_Add(&DDRC, &PORTC, &PINC, PC7, 0x8001); // Doesn't work, check the board
@@ -53,6 +56,7 @@ int main(void) {
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA5, 0x8005);
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA4, 0x8006);
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA3, 0x8007);
+    
 
 	// PWMs
 	(void)FastPWM_Add(&TCCR0A, &OCR0A, &DDRB, PB7, 3000);

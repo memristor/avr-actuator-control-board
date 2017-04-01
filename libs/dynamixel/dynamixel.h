@@ -17,7 +17,7 @@
 #define DYNAMIXEL_PARAMETER    5
 
 #define DYNAMIXEL_BROADCAST_ID  254
-#define DYNAMIXEL_PACKET_SIZE   128
+#define DYNAMIXEL_PACKET_SIZE   256
 
 #define DYNAMIXEL_PING        1
 #define DYNAMIXEL_READ        2
@@ -33,15 +33,12 @@
 #define DYNAMIXEL_TX_FAIL     4
 #define DYNAMIXEL_TX_TIMEOUT  5
 
+#define DYNAMIXEL_RETRY_COUNT	3
+
 #ifndef DYNAMIXEL_TIMEOUT_MS
 // Timeout in milliseconds
 #define DYNAMIXEL_TIMEOUT_MS 150
 #endif
-
-typedef enum _DynamixelType { 
-	DYNAMIXEL_TYPE_AX = 0, 
-	DYNAMIXEL_TYPE_RX
-} DynamixelType;
 
 
 void dynamixel_ax_init(void);
