@@ -33,7 +33,7 @@
 #define DYNAMIXEL_TX_FAIL     4
 #define DYNAMIXEL_TX_TIMEOUT  5
 
-#define DYNAMIXEL_RETRY_COUNT	3
+#define DYNAMIXEL_RETRY_COUNT	10
 
 #ifndef DYNAMIXEL_TIMEOUT_MS
 // Timeout in milliseconds

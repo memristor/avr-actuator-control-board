@@ -26,8 +26,6 @@ static volatile uint8_t rx_buffer[DYNAMIXEL_PACKET_SIZE];
 static volatile uint8_t rx_buffer_index = 0;
 static void rx_write(uint8_t c);
 
-static uint8_t retry_count = 0;
-
 
 ISR(USART0_RX_vect) {
 	uint8_t data = UDR0;
@@ -176,39 +174,40 @@ uint8_t readpacket(
 uint8_t dynamixel_ax_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket) {
 	uint8_t rxlength = 0;
 	uint8_t txlength = txpacket[DYNAMIXEL_LENGTH] + 4;
-	uint8_t status;
+	uint8_t status = DYNAMIXEL_SUCCESS;
 	
 	txpacket[0] = (uint8_t) 0xff;
 	txpacket[1] = (uint8_t) 0xff;
 	txpacket[txlength - 1] = (uint8_t)calculatechecksum(txpacket);
 	
-	// Write packet	
-	ax_settx();
-	for(uint8_t i = 0; i < txlength; i++) {
-		ax_write(txpacket[i]);
-	}
-	ax_setrx();
-	
-	
-	// Read response
-	if(txpacket[DYNAMIXEL_ID] != DYNAMIXEL_BROADCAST_ID) {	
-		if(txpacket[DYNAMIXEL_INSTRUCTION] == DYNAMIXEL_READ) {
-			rxlength = txpacket[DYNAMIXEL_PARAMETER + 1] + 6;
+	for (uint8_t i = 0; i < DYNAMIXEL_RETRY_COUNT; i++) {
+		// Write packet	
+		ax_settx();
+		for(uint8_t i = 0; i < txlength; i++) {
+			ax_write(txpacket[i]);
 		}
-		else {
-			rxlength = 6;
-		}
+		ax_setrx();
 		
-		status = readpacket(rxpacket, rxlength, ax_buffer, &ax_buffer_index);
-		if (status != DYNAMIXEL_SUCCESS && (retry_count++) < DYNAMIXEL_RETRY_COUNT) {
-			dynamixel_rx_txrx(txpacket, rxpacket);
+		
+		// Read response
+		if(txpacket[DYNAMIXEL_ID] != DYNAMIXEL_BROADCAST_ID) {	
+			if(txpacket[DYNAMIXEL_INSTRUCTION] == DYNAMIXEL_READ) {
+				rxlength = txpacket[DYNAMIXEL_PARAMETER + 1] + 6;
+			}
+			else {
+				rxlength = 6;
+			}
+			
+			status = readpacket(rxpacket, rxlength, ax_buffer, &ax_buffer_index);
+			if (status == DYNAMIXEL_SUCCESS) {
+				return status;
+			}
 		} else {
-			retry_count = 0;
-			return status;
+			return DYNAMIXEL_SUCCESS;
 		}
 	}
 		
-	return DYNAMIXEL_SUCCESS;
+	return status;
 }
 
 uint8_t dynamixel_rx_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket) {
