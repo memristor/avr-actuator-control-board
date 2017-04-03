@@ -56,11 +56,12 @@ int main(void) {
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA5, 0x8005);
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA4, 0x8006);
     (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA3, 0x8007);
-    
 
 	// PWMs
-	(void)FastPWM_Add(&TCCR0A, &OCR0A, &DDRB, PB7, 3000);
+	//(void)FastPWM_Add(&TCCR0A, &OCR0A, &DDRB, PB7, 3000);
 	
+	// H-Bridges
+	HBridge_Add(&DDRC, &PORTC, PC0, PC1, PC2, 1101);
 
     while (1) {
 		// AX12_UpdateAll();
@@ -77,6 +78,7 @@ int main(void) {
 				AX12_OnMessage(&msg);
 				RX24_OnMessage(&msg);
 				FastPWM_OnMessage(&msg);
+				HBridge_OnMessage(&msg);
             }
         }
     }
