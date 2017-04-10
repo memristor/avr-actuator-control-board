@@ -5,6 +5,7 @@
 #include <can/can.h>
 #include <can/can_wrapper.h>
 #include "Utils.h"
+#include "Pin.h"
 
 #ifndef BINARY_SENSOR_CONFIG_MAX
 #define BINARY_SENSOR_CONFIG_MAX 10
@@ -12,8 +13,7 @@
 #endif
 
 typedef struct _BinarySensor {
-    volatile uint8_t* pin;
-    uint8_t p;
+    Pin* pin;
     uint16_t canId;
     uint8_t state;
 } BinarySensor;
@@ -21,26 +21,14 @@ typedef struct _BinarySensor {
 
 /**
  * Instance a new binary sensor and put it to binary sensor collection.
- * @example uint8_t sensorId = BinarySensor_Push(&DDRC, &PORTC, &PINC, PC6, 0x8000);
- * 
- * @param ddr
- * @param port
- * @param pin
- * @param p
- * @param canId
+ * @example uint8_t sensorId = BinarySensor_Add(&PinC6, 0x8000);
  */ 
-extern uint8_t BinarySensor_Add(
-	volatile uint8_t* ddr,
-	volatile uint8_t* port,
-	volatile uint8_t* pin,
-	uint8_t p,
-	uint16_t canId
-);
+void BinarySensor_Add(Pin* pin, uint16_t canId);
 
 /**
  * Check state of all binary sensors. Call this function in loop.
  * @example while (1) { BinarySensor_UpdateAll(); }
  */
-extern void BinarySensor_UpdateAll(void);
+void BinarySensor_UpdateAll(void);
 
 #endif

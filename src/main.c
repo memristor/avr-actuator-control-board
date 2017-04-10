@@ -11,6 +11,9 @@
 #include "MCP.h"
 #include "FastPWM.h"
 #include "RX24.h"
+#include "Utils.h"
+#include "HBridge.h"
+#include "Pin.h"
 
 int main(void) {
 	Utils_Init();
@@ -24,44 +27,35 @@ int main(void) {
 	
 	MCP mcpFirstRow;
 	MCP_Init(&mcpFirstRow, 0x07, &PORTB, &DDRB, PB0);
-	
-	MCP mcpSecondRow;
-	MCP_Init(&mcpSecondRow, 0x00, &PORTB, &DDRB, PB0);
 
 	// Enable interrupts
     sei();
     
-
     // Binary actuators
-    (void)MCP_AddActuator(&mcpFirstRow, GPIOA, 0, 1000);
-	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 1, 1001);
-	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 2, 1002);
-	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 3, 1003);
-	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 4, 1004);
-	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 5, 1005);
-	(void)MCP_AddActuator(&mcpFirstRow, GPIOA, 6, 1006);
-	
-	(void)MCP_AddActuator(&mcpSecondRow, GPIOB, 4, 1014);
-	(void)MCP_AddActuator(&mcpSecondRow, GPIOB, 5, 1015);
-	(void)MCP_AddActuator(&mcpSecondRow, GPIOB, 6, 1016);
+    MCP_AddActuator(&mcpFirstRow, GPIOA, 0, 1000);
+	MCP_AddActuator(&mcpFirstRow, GPIOA, 1, 1001);
+	MCP_AddActuator(&mcpFirstRow, GPIOA, 2, 1002);
+	MCP_AddActuator(&mcpFirstRow, GPIOA, 3, 1003);
+	MCP_AddActuator(&mcpFirstRow, GPIOA, 4, 1004);
+	MCP_AddActuator(&mcpFirstRow, GPIOA, 5, 1005);
+	MCP_AddActuator(&mcpFirstRow, GPIOA, 6, 1006);
     
-	(void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA2, 0x8008);
-    
-	// Binary sensors
-	(void)BinarySensor_Add(&DDRC, &PORTC, &PINC, PC6, 0x8000);
-	(void)BinarySensor_Add(&DDRC, &PORTC, &PINC, PC7, 0x8001); // Doesn't work, check the board
-    (void)BinarySensor_Add(&DDRG, &PORTG, &PING, PG2, 0x8002);
-    (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA7, 0x8003);
-    (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA6, 0x8004);
-    (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA5, 0x8005);
-    (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA4, 0x8006);
-    (void)BinarySensor_Add(&DDRA, &PORTA, &PINA, PA3, 0x8007);
+	// Infrareds
+	BinarySensor_Add(&Pin_C6, 64000);
+	BinarySensor_Add(&Pin_C7, 64001); // Doesn't work, check the board
+	BinarySensor_Add(&Pin_G2, 64002);
+	BinarySensor_Add(&Pin_A7, 64003);
+	BinarySensor_Add(&Pin_A6, 64004);
+	BinarySensor_Add(&Pin_A5, 64005);
+	BinarySensor_Add(&Pin_A4, 64006);
+	BinarySensor_Add(&Pin_A3, 64007);
+	BinarySensor_Add(&Pin_A2, 64008);
 
 	// PWMs
-	//(void)FastPWM_Add(&TCCR0A, &OCR0A, &DDRB, PB7, 3000);
+	// FastPWM_Add(&Timer0, &PinB7, 3000);
 	
 	// H-Bridges
-	HBridge_Add(&DDRC, &PORTC, PC0, PC1, PC2, 1101);
+	HBridge_Add(&Pin_C0, &Pin_C1, &Pin_C2, 1101);
 
     while (1) {
 		// AX12_UpdateAll();
@@ -74,7 +68,6 @@ int main(void) {
             // Try to read the message
             if (can_get_message(&msg)) {
 				MCP_OnMessage(&mcpFirstRow, &msg);
-				MCP_OnMessage(&mcpSecondRow, &msg);
 				AX12_OnMessage(&msg);
 				RX24_OnMessage(&msg);
 				FastPWM_OnMessage(&msg);

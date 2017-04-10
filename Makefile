@@ -80,7 +80,7 @@ OBJDIR = build
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = ./src/main.c ./src/BinarySensor.c ./src/Debugger.c ./src/AX12.c ./src/RX24.c ./src/Utils.c ./src/MCP.c ./src/FastPWM.c ./src/HBridge.c
+SRC = ./src/Utils.c ./src/Pin.c ./src/main.c ./src/BinarySensor.c ./src/Debugger.c ./src/AX12.c ./src/RX24.c ./src/MCP.c ./src/FastPWM.c ./src/HBridge.c
 
 # Libs here
 SRC += ./libs/can/can_wrapper.c ./libs/dynamixel/dynamixel.c

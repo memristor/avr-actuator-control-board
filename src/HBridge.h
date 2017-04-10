@@ -3,26 +3,20 @@
 
 #include <inttypes.h>
 #include <can/can.h>
+#include "Utils.h"
+#include "Pin.h"
 
 typedef struct _HBridge {
-	uint8_t ina;
-	uint8_t inb;
-	uint8_t inh;
+	Pin* inA;
+	Pin* inB;
+	Pin* inH;
 	uint16_t canId;
-	volatile uint8_t* port;
 } HBridge;
 
 /**
- *	@example HBridge_Add(&DDRC, &PORTC, PC0, PC1, PC2, 1101);
+ * @example HBridge_Add(&PinC0, &PinC1, &PinC2, 1101);
  */
-void HBridge_Add(
-	volatile uint8_t* ddr,
-	volatile uint8_t* port,
-	uint8_t ina,
-	uint8_t inb,
-	uint8_t inh,
-	uint16_t canId
-);
+void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, uint16_t canId);
 
 void HBridge_OnMessage(can_t* canMsg);
 

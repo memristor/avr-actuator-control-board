@@ -8,18 +8,16 @@
 static FastPWM instances[FAST_PWM_CONFIG_COUNT_MAX];
 static uint8_t instancesCount = 0;
 
-uint8_t FastPWM_Add(volatile uint8_t* counter, volatile uint8_t* ocr, volatile uint8_t* ddr, uint8_t p, uint16_t canId) {
+void FastPWM_Add(Pin* pin, uint16_t canId) {
    uint8_t index = instancesCount;
    
-   (*counter) |= (1<<WGM00) | (1<<WGM01) | (1<<COM0A1) | (1<<CS00);
-   (*ddr) |= (1 << p);
+   Pin_SetMode(pin, PIN_OUTPUT);
+   Pin_EnableAnalog(pin);
    
    instances[index].canId = canId;
-   instances[index].ocr = ocr;
+   instances[index].pin = pin;
    
    instancesCount++;
-   
-   return index;
 }
 
 void FastPWM_OnMessage(can_t* canMsg) {
@@ -27,7 +25,7 @@ void FastPWM_OnMessage(can_t* canMsg) {
 	
 	for (i = 0; i < instancesCount; i++) {
 		if (unlikely(canMsg->id == instances[i].canId)) {
-			*(instances[i].ocr) = canMsg->data[0];
+			Pin_WriteAnalog(instances[i].pin, canMsg->data[0]);
 		}
 	}
 }

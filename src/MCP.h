@@ -76,26 +76,26 @@ typedef struct _MCP {
  * Initialize binary actuator module. It uses SPI to communicate to MCP and set state for switches. 
  * @example MCP_Init(&mcp, 0x00, &PORTB, &DDRB, PB0);
  */
-extern void MCP_Init(MCP* mcp, uint8_t slaveAddress, volatile uint8_t* port, volatile uint8_t* ddr, uint8_t cs);
+void MCP_Init(MCP* mcp, uint8_t slaveAddress, volatile uint8_t* port, volatile uint8_t* ddr, uint8_t cs);
 
 /**
  * Add new binary actuator to collection.
  * @ref http://www.atmel.com/webdoc/AVRLibcReferenceManual/FAQ_1faq_port_pass.html
  */
-extern uint8_t MCP_AddActuator(MCP* mcp, uint8_t port, uint8_t p, uint16_t canId);
+uint8_t MCP_AddActuator(MCP* mcp, uint8_t port, uint8_t p, uint16_t canId);
 
-extern uint8_t MCP_AddSensor(MCP* mcp, uint8_t port, uint8_t p, uint16_t canId);
+uint8_t MCP_AddSensor(MCP* mcp, uint8_t port, uint8_t p, uint16_t canId);
 
 /**
  * Try to update state of binary actuators. Call this function on message received.
  * @example if (can_get_message(&msg)) { MCP_OnMessage(&msg); }
  */
-extern void MCP_OnMessage(MCP* mcp, const can_t* const canMsg);
+void MCP_OnMessage(MCP* mcp, const can_t* const canMsg);
 
 /**
  * Call this function in a main loop only if you have at least one sensor.
  */
-extern void MCP_UpdateAll(void);
+void MCP_UpdateAll(void);
 
 
 #endif
