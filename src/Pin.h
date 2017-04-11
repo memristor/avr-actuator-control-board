@@ -3,15 +3,18 @@
 
 #include <avr/io.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "Utils.h"
 
 typedef struct _Timer {
-	volatile uint8_t* TCCRnx;
-	volatile uint16_t* OCRnx;
+	volatile uint8_t* TCCRnA;
+	volatile uint8_t* TCCRnB;
+	volatile uint16_t* OCRnA;
 	uint8_t WGMn0;
 	uint8_t WGMn1;
-	uint8_t COMnx1;
+	uint8_t COMnA1;
 	uint8_t CSn0;
+	uint8_t bits;
 } Timer;
 
 typedef struct _Pin {
@@ -32,10 +35,29 @@ typedef enum _PinValue {
 	PIN_HIGH = 1
 } PinValue;
 
+/**
+ * @example Pin_SetMode(&Pin_B5, PIN_OUTPUT);
+ */
 void Pin_SetMode(Pin* pin, PinMode mode);
+
+/**
+ * @example Pin_EnableAnalog(&Pin_B5);
+ */
 void Pin_EnableAnalog(Pin* pin);
+
+/**
+ * @example Pin_WriteAnalog(&Pin_B5, 400);
+ */
 void Pin_WriteAnalog(Pin* pin, uint16_t value);
+
+/**
+ * @example Pin_WriteDigital(&Pin_B5, PIN_HIGH);
+ */
 void Pin_WriteDigital(Pin* pin, PinValue value);
+
+/**
+ * @example PinValue value = Pin_ReadDigital(&Pin_B5);
+ */
 PinValue Pin_ReadDigital(Pin* pin);
 
 extern Pin Pin_B5;

@@ -17,11 +17,15 @@ void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, uint16_t canId) {
 	set_bit(DDRC, PC4);
 
 	TCCR1A |= (1 << WGM10) | (1 << WGM11) | (1 << COM1A1) | (1 << CS10);
+	clear_bit(TCCR1A, CS11);
+	clear_bit(TCCR1A, CS12);
 	
 	set_bit(DDRC, PC3);
 	set_bit(DDRC, PC4);
 	set_bit(PORTC, PC3);
 	clear_bit(PORTC, PC4);
+	
+	
 	OCR1A = 500;
 
 	count++;

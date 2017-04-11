@@ -14,15 +14,31 @@ void Pin_SetMode(Pin* pin, PinMode mode) {
 }
 
 void Pin_EnableAnalog(Pin* pin) {
-	*(pin->timer->TCCRnx) |= 
-		(1 << pin->timer->WGMn0) | 
-		(1 << pin->timer->WGMn1) | 
-		(1 << pin->timer->COMnx1) | 
-		(1 << pin->timer->CSn0);
+	switch (pin->timer->bits) {
+		// Configuration for 8bit timers
+		case 8:
+			*(pin->timer->TCCRnA) |= 
+				(1 << pin->timer->WGMn0) | 
+				(1 << pin->timer->WGMn1) | 
+				(1 << pin->timer->COMnA1) | 
+				(1 << pin->timer->CSn0);
+			break;
+			
+		// Configuration for 16bit timers
+		case 16:
+			*(pin->timer->TCCRnA) |= 
+				(1 << pin->timer->WGMn0) | 
+				(1 << pin->timer->WGMn1) | 
+				(1 << pin->timer->COMnA1);
+				
+			*(pin->timer->TCCRnB) |=
+				(1 << pin->timer->CSn0);
+			break;
+	}
 }
 
 void Pin_WriteAnalog(Pin* pin, uint16_t value) {
-	*(pin->timer->OCRnx) = value;
+	*(pin->timer->OCRnA) = value;
 }
 
 void Pin_WriteDigital(Pin* pin, PinValue value) {
@@ -40,22 +56,25 @@ PinValue Pin_ReadDigital(Pin* pin) {
 
 // PB5
 Timer Timer_1A = {
-	.TCCRnx = &TCCR1A,
-	.OCRnx = &OCR1A,
+	.TCCRnA = &TCCR1A,
+	.TCCRnB = &TCCR1B,
+	.OCRnA = &OCR1A,
 	.WGMn0 = WGM10,
 	.WGMn1 = WGM11,
-	.COMnx1 = COM1A1,
-	.CSn0 = CS10
+	.COMnA1 = COM1A1,
+	.CSn0 = CS10,
+	.bits = 16
 };
 
 // PB4
 Timer Timer_2A = {
-	.TCCRnx = &TCCR2A,
-	.OCRnx = &OCR2A,
+	.TCCRnA = &TCCR2A,
+	.OCRnA = &OCR2A,
 	.WGMn0 = WGM20,
 	.WGMn1 = WGM21,
-	.COMnx1 = COM2A1,
-	.CSn0 = CS20
+	.COMnA1 = COM2A1,
+	.CSn0 = CS20,
+	.bits = 8
 };
 
 Pin Pin_B4 = {
