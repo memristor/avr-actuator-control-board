@@ -12,21 +12,10 @@ void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, uint16_t canId) {
 	instances[count].inH = inH;
 	instances[count].canId = canId;
 
-	set_bit(DDRB, PB5);
-	set_bit(DDRC, PC3);
-	set_bit(DDRC, PC4);
-
-	TCCR1A |= (1 << WGM10) | (1 << WGM11) | (1 << COM1A1) | (1 << CS10);
-	clear_bit(TCCR1A, CS11);
-	clear_bit(TCCR1A, CS12);
-	
-	set_bit(DDRC, PC3);
-	set_bit(DDRC, PC4);
-	set_bit(PORTC, PC3);
-	clear_bit(PORTC, PC4);
-	
-	
-	OCR1A = 500;
+	Pin_SetMode(inH, PIN_OUTPUT);
+	Pin_SetMode(inA, PIN_OUTPUT);
+	Pin_SetMode(inB, PIN_OUTPUT);
+    Pin_EnableAnalog(inH);
 
 	count++;
 }
@@ -37,19 +26,25 @@ void HBridge_OnMessage(can_t* canMsg) {
 	for (i = 0; i < count; i++) {
 		if (unlikely(canMsg->id == instances[i].canId)) {
 			
-			// Set direction
-			if (canMsg->data[1] == 0) { 
-				// ...
-			} else {
-				// ...
+			switch(canMsg->data[1]) {
+				case 0: // Left
+					Pin_WriteDigital(instances[i].inA, PIN_LOW);
+					Pin_WriteDigital(instances[i].inB, PIN_HIGH);
+					break;
+				case 1:	// Right
+					Pin_WriteDigital(instances[i].inA, PIN_HIGH);
+					Pin_WriteDigital(instances[i].inB, PIN_LOW);
+					break;
+				case 2:	// Stop
+					Pin_WriteDigital(instances[i].inA, PIN_HIGH);
+					Pin_WriteDigital(instances[i].inB, PIN_HIGH);
+					break;
 			}
 			
 			// Set output
-			if (canMsg->data[0] == 0) {
-				// Write 0
-			} else {
-				// Write value
-			}
+			Pin_WriteAnalog(instances[i].inH, canMsg->data[0]);
+			
+			return;
 		}
 	}
 }

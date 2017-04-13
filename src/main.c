@@ -27,9 +27,6 @@ int main(void) {
 	
 	MCP mcpFirstRow;
 	MCP_Init(&mcpFirstRow, 0x07, &PORTB, &DDRB, PB0);
-
-	// Enable interrupts
-    sei();
     
     // Binary actuators
     MCP_AddActuator(&mcpFirstRow, GPIOA, 0, 1000);
@@ -55,7 +52,11 @@ int main(void) {
 	// FastPWM_Add(&Timer0, &PinB7, 3000);
 	
 	// H-Bridges
-	HBridge_Add(&Pin_C0, &Pin_C1, &Pin_C2, 1101);
+	HBridge_Add(&Pin_C3, &Pin_C4, &Pin_B5, 1101);
+	
+	
+	// Enable interrupts
+    sei();
 
     while (1) {
 		// AX12_UpdateAll();

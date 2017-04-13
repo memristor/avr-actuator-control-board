@@ -26,13 +26,30 @@ void Pin_EnableAnalog(Pin* pin) {
 			
 		// Configuration for 16bit timers
 		case 16:
+			/*
+			// ~66KHz
 			*(pin->timer->TCCRnA) |= 
 				(1 << pin->timer->WGMn0) | 
+				(1 << pin->timer->COMnA1);
+				
+			*(pin->timer->TCCRnB) |=
+				(1 << pin->timer->CSn0) |
+				(1 << pin->timer->WGMn2);
+				
+			clear_bit(*(pin->timer->TCCRnB), pin->timer->CSn1);
+			*/
+			
+			// ~19.5KHz
+			*(pin->timer->TCCRnA) |= 
 				(1 << pin->timer->WGMn1) | 
 				(1 << pin->timer->COMnA1);
 				
 			*(pin->timer->TCCRnB) |=
-				(1 << pin->timer->CSn0);
+				(1 << pin->timer->CSn1) |
+				(1 << pin->timer->WGMn2) |
+				(1 << pin->timer->WGMn3);
+				
+			*(pin->timer->ICRn) = 100;
 			break;
 	}
 }
@@ -59,10 +76,14 @@ Timer Timer_1A = {
 	.TCCRnA = &TCCR1A,
 	.TCCRnB = &TCCR1B,
 	.OCRnA = &OCR1A,
+	.ICRn = &ICR1,
 	.WGMn0 = WGM10,
 	.WGMn1 = WGM11,
+	.WGMn2 = WGM12,
+	.WGMn3 = WGM13,
 	.COMnA1 = COM1A1,
 	.CSn0 = CS10,
+	.CSn1 = CS11,
 	.bits = 16
 };
 
@@ -70,10 +91,14 @@ Timer Timer_1A = {
 Timer Timer_2A = {
 	.TCCRnA = &TCCR2A,
 	.OCRnA = &OCR2A,
+	.ICRn = 0,
 	.WGMn0 = WGM20,
 	.WGMn1 = WGM21,
+	.WGMn2 = 0,
+	.WGMn3 = 0,
 	.COMnA1 = COM2A1,
 	.CSn0 = CS20,
+	.CSn1 = CS21,
 	.bits = 8
 };
 
@@ -196,3 +221,20 @@ Pin Pin_C2 = {
 	.Pxn = PC2,
 	.timer = NULL
 };
+
+Pin Pin_C3 = {
+	.DDRx = &DDRC,
+	.PORTx = &PORTC,
+	.PINx = &PINC,
+	.Pxn = PC3,
+	.timer = NULL
+};
+
+Pin Pin_C4 = {
+	.DDRx = &DDRC,
+	.PORTx = &PORTC,
+	.PINx = &PINC,
+	.Pxn = PC4,
+	.timer = NULL
+};
+
