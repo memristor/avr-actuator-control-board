@@ -4,6 +4,7 @@
 #include <can/can.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "Config.h"
 
 #ifndef RX24_CONFIG_QUEUE_MAX
 #define RX24_CONFIG_QUEUE_MAX 2
@@ -11,5 +12,5 @@
 #endif
 
 void RX24_InitAll(uint16_t canId);
-void RX24_OnMessage(can_t* canMsg);
+bool RX24_OnMessage(can_t* canMsg);
 #endif

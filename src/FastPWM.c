@@ -20,12 +20,15 @@ void FastPWM_Add(Pin* pin, uint16_t canId) {
    instancesCount++;
 }
 
-void FastPWM_OnMessage(can_t* canMsg) {
+bool FastPWM_OnMessage(can_t* canMsg) {
 	size_t i;
 	
 	for (i = 0; i < instancesCount; i++) {
 		if (unlikely(canMsg->id == instances[i].canId)) {
 			Pin_WriteAnalog(instances[i].pin, canMsg->data[0]);
+			return true;
 		}
 	}
+	
+	return false;
 }

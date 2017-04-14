@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <util/delay.h>
+#include "Config.h"
 
 typedef enum _Debugger_LED { 
 	DEBUGGER_LED1 = 0, 

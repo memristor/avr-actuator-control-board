@@ -4,6 +4,7 @@
 #include <can/can.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "Config.h"
 
 #ifndef AX12_CONFIG_QUEUE_MAX
 #define AX12_CONFIG_QUEUE_MAX 10
@@ -21,6 +22,6 @@ typedef struct _AX12 {
 } AX12;
 
 void AX12_InitAll(uint16_t canId);
-void AX12_OnMessage(can_t* canMsg);
+bool AX12_OnMessage(can_t* canMsg);
 void AX12_UpdateAll(void);
 #endif

@@ -69,7 +69,7 @@ uint8_t MCP_AddActuator(MCP* mcp, uint8_t port, uint8_t p, uint16_t canId) {
     return index;
 }
 
-void MCP_OnMessage(MCP* mcp, const can_t* const canMsg) {
+bool MCP_OnMessage(MCP* mcp, const can_t* const canMsg) {
 	size_t i;
 	
 	for (i = 0; i < mcp->actuatorsCount; i++) {
@@ -84,8 +84,12 @@ void MCP_OnMessage(MCP* mcp, const can_t* const canMsg) {
 				set_bit((*currentPortState), mcp->actuators[i].p);
 			}
 			SPI_Write(mcp, mcp->actuators[i].port, (*currentPortState));
+			
+			return true;
 		}
 	}
+	
+	return false;
 }	
 
 void SPI_Write(MCP* mcp, uint8_t port, uint8_t data) {

@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include <can/can_wrapper.h>
 
-static HBridge instances[5];
+static HBridge instances[HBRIDGE_CONFIG_COUNT_MAX];
 static uint8_t count = 0;
 
 void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, uint16_t canId) {
@@ -20,7 +20,7 @@ void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, uint16_t canId) {
 	count++;
 }
 
-void HBridge_OnMessage(can_t* canMsg) {
+bool HBridge_OnMessage(can_t* canMsg) {
 	size_t i;
 	
 	for (i = 0; i < count; i++) {
@@ -44,7 +44,9 @@ void HBridge_OnMessage(can_t* canMsg) {
 			// Set output
 			Pin_WriteAnalog(instances[i].inH, canMsg->data[0]);
 			
-			return;
+			return true;
 		}
 	}
+	
+	return false;
 }

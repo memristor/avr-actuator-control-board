@@ -17,6 +17,7 @@ static uint8_t positionUpdateQueueCount = 0;
 static size_t i;
 	
 void AX12_UpdateAll(void) {
+	/*
 	for (i = 0; i < positionUpdateQueueCount; i++) {
 		// If disabled do not check anything. `0` means don't check!
 		if (likely(positionUpdateQueue[i].updatePeriodMs == 0)) {
@@ -29,19 +30,18 @@ void AX12_UpdateAll(void) {
 			
 			positionUpdateQueue[i].lastUpdate = Utils_Mills();
 			
-			/*
 			status = dynamixel_readword(
 				positionUpdateQueue[i].id, 
 				AX_PRESENT_POSITION_L, 
 				&value
 			);
-			*/
 			
 			if (abs(value - positionUpdateQueue[i].requiredPosition) <= positionUpdateQueue[i].tolerance) {
 				// TODO: Send response
 			}
 		}
 	}
+	*/
 }
 
 void AX12_InitAll(uint16_t canId) {
@@ -49,7 +49,7 @@ void AX12_InitAll(uint16_t canId) {
 	CAN_ID = canId;
 }
 
-void AX12_OnMessage(can_t* canMsg) {
+bool AX12_OnMessage(can_t* canMsg) {
 	if (unlikely(canMsg->id == CAN_ID)) {
 		uint8_t txpacket[11];
 		uint8_t rxpacket[11];
@@ -76,5 +76,9 @@ void AX12_OnMessage(can_t* canMsg) {
 		}		
 		msg.length = packetKernelLength;
 		can_send_message(&msg);
+		
+		return true;
 	}
+	
+	return false;
 }

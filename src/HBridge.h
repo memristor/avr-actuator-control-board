@@ -3,8 +3,15 @@
 
 #include <inttypes.h>
 #include <can/can.h>
+#include <stdbool.h>
 #include "Utils.h"
 #include "Pin.h"
+#include "Config.h"
+
+#ifndef HBRIDGE_CONFIG_COUNT_MAX
+#define HBRIDGE_CONFIG_COUNT_MAX 10
+#warning "Max number of HBridge update is not redefined"
+#endif
 
 typedef struct _HBridge {
 	Pin* inA;
@@ -18,6 +25,6 @@ typedef struct _HBridge {
  */
 void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, uint16_t canId);
 
-void HBridge_OnMessage(can_t* canMsg);
+bool HBridge_OnMessage(can_t* canMsg);
 
 #endif

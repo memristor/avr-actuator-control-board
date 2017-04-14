@@ -14,7 +14,7 @@ void RX24_InitAll(uint16_t canId) {
 	CAN_ID = canId;
 }
 
-void RX24_OnMessage(can_t* canMsg) {
+bool RX24_OnMessage(can_t* canMsg) {
 	if (unlikely(canMsg->id == CAN_ID)) {
 		uint8_t txpacket[11];
 		uint8_t rxpacket[11];
@@ -39,5 +39,9 @@ void RX24_OnMessage(can_t* canMsg) {
 		}		
 		msg.length = packetKernelLength;
 		can_send_message(&msg);
+		
+		return true;
 	}
+	
+	return false;
 }

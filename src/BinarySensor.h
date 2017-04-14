@@ -6,6 +6,7 @@
 #include <can/can_wrapper.h>
 #include "Utils.h"
 #include "Pin.h"
+#include "Config.h"
 
 #ifndef BINARY_SENSOR_CONFIG_MAX
 #define BINARY_SENSOR_CONFIG_MAX 10

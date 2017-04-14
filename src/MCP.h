@@ -2,8 +2,10 @@
 #define _MCP_H_ 
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <can/can.h>
 #include "Debugger.h"
+#include "Config.h"
 
 #ifndef MCP_CONFIG_SENSOR_MAX
 #define MCP_CONFIG_SENSOR_MAX 5
@@ -90,7 +92,7 @@ uint8_t MCP_AddSensor(MCP* mcp, uint8_t port, uint8_t p, uint16_t canId);
  * Try to update state of binary actuators. Call this function on message received.
  * @example if (can_get_message(&msg)) { MCP_OnMessage(&msg); }
  */
-void MCP_OnMessage(MCP* mcp, const can_t* const canMsg);
+bool MCP_OnMessage(MCP* mcp, const can_t* const canMsg);
 
 /**
  * Call this function in a main loop only if you have at least one sensor.
