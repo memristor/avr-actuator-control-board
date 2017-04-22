@@ -53,8 +53,8 @@ int main(void) {
 	// Init CAN bus
 	can_init(BITRATE_500_KBPS);
 	can_filter_t filter = {
-        .id = 0x00007F00,
-        .mask = 0x1FFFFF00,
+        .id = 0,
+        .mask = 0,
         .flags = {
             .rtr = 0,
             .extended = 0
@@ -72,9 +72,11 @@ int main(void) {
         // Check if a new message was received
         if (can_check_message()) {
             can_t msg;
-
+			
             // Try to read the message
-            if (can_get_message(&msg)) {
+            if (can_get_message(&msg)) {	
+				if (msg.id == 0xff) continue; // Ignore lidar messages
+											
 				// TODO: Implement binary search tree
 				if (AX12_OnMessage(&msg) == true) continue;
 				if (RX24_OnMessage(&msg) == true) continue;

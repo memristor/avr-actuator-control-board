@@ -50,6 +50,18 @@ void Pin_EnableAnalog(Pin* pin) {
 				(1 << pin->timer->WGMn3);
 				
 			*(pin->timer->ICRn) = 100;
+			
+			// 1Khz
+			/*
+			*(pin->timer->TCCRnA) |= 
+				(1 << pin->timer->WGMn0) | 
+				(1 << pin->timer->COMnA1);
+				
+			*(pin->timer->TCCRnB) |=
+				(1 << pin->timer->CSn0) |
+				(1 << pin->timer->CSn1) |
+				(1 << pin->timer->WGMn2);
+			*/
 			break;
 	}
 }
@@ -68,7 +80,11 @@ void Pin_WriteDigital(Pin* pin, PinValue value) {
 }
 
 PinValue Pin_ReadDigital(Pin* pin) {
-	return bit_is_set(*(pin->PINx), pin->Pxn);
+	if (bit_is_set(*(pin->PINx), pin->Pxn)) {
+		return PIN_HIGH;
+	} else {
+		return PIN_LOW;
+	}
 }
 
 // PB5
