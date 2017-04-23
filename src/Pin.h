@@ -39,6 +39,13 @@ typedef enum _PinValue {
 	PIN_HIGH = 1
 } PinValue;
 
+typedef enum _PinFrequency {
+	PIN_1KHz = 0,
+	PIN_7KHz,
+	PIN_20KHz,
+	PIN_66KHz,
+} PinFrequency;
+
 /**
  * @example Pin_SetMode(&Pin_B5, PIN_OUTPUT);
  */
@@ -47,7 +54,7 @@ void Pin_SetMode(Pin* pin, PinMode mode);
 /**
  * @example Pin_EnableAnalog(&Pin_B5);
  */
-void Pin_EnableAnalog(Pin* pin);
+void Pin_EnableAnalog(Pin* pin, PinFrequency frequency);
 
 /**
  * @example Pin_WriteAnalog(&Pin_B5, 400);
@@ -65,6 +72,7 @@ void Pin_WriteDigital(Pin* pin, PinValue value);
 PinValue Pin_ReadDigital(Pin* pin);
 
 extern Pin Pin_B5;
+extern Pin Pin_B7;
 extern Pin Pin_B4;
 extern Pin Pin_B0;
 extern Pin Pin_A2;

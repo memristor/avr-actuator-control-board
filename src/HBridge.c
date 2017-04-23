@@ -6,7 +6,7 @@
 static HBridge instances[HBRIDGE_CONFIG_COUNT_MAX];
 static uint8_t count = 0;
 
-void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, uint16_t canId) {
+void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, PinFrequency frequency, uint16_t canId) {
 	instances[count].inA = inA;
 	instances[count].inB = inB;
 	instances[count].inH = inH;
@@ -15,7 +15,7 @@ void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, uint16_t canId) {
 	Pin_SetMode(inH, PIN_OUTPUT);
 	Pin_SetMode(inA, PIN_OUTPUT);
 	Pin_SetMode(inB, PIN_OUTPUT);
-    Pin_EnableAnalog(inH);
+    Pin_EnableAnalog(inH, frequency);
 
 	count++;
 }

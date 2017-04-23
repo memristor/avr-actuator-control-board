@@ -45,11 +45,13 @@ int main(void) {
 	BinarySensor_Add(&Pin_A2, 0x00007F11);
 
 	// PWMs
-	// FastPWM_Add(&Timer0, &PinB7, 0x00007F12);
-	
+	FastPWM_Add(&Pin_B7, 0x00007F12);
+	Pin_WriteAnalog(&Pin_B7, 255); // Turn off by default
+		
 	// H-Bridges
-	HBridge_Add(&Pin_C3, &Pin_C4, &Pin_B5, 0x00007F13);
-	
+	HBridge_Add(&Pin_C3, &Pin_C4, &Pin_B5, PIN_20KHz, 0x00007F13);
+	HBridge_Add(&Pin_C0, &Pin_C1, &Pin_B4, PIN_7KHz, 0x00007F14);
+
 	// Init CAN bus
 	can_init(BITRATE_500_KBPS);
 	can_filter_t filter = {

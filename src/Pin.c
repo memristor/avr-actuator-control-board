@@ -13,55 +13,75 @@ void Pin_SetMode(Pin* pin, PinMode mode) {
 	}
 }
 
-void Pin_EnableAnalog(Pin* pin) {
+void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 	switch (pin->timer->bits) {
 		// Configuration for 8bit timers
 		case 8:
-			*(pin->timer->TCCRnA) |= 
-				(1 << pin->timer->WGMn0) | 
-				(1 << pin->timer->WGMn1) | 
-				(1 << pin->timer->COMnA1) | 
-				(1 << pin->timer->CSn0);
+			switch (frequency) {
+				case PIN_7KHz:
+					*(pin->timer->TCCRnA) |= 
+						(1 << pin->timer->WGMn0) | 
+						(1 << pin->timer->WGMn1) | 
+						(1 << pin->timer->COMnA1) | 
+						(1 << pin->timer->CSn1);
+				break;
+				case PIN_1KHz:
+					*(pin->timer->TCCRnA) |= 
+					(1 << pin->timer->WGMn0) | 
+					(1 << pin->timer->WGMn1) | 
+					(1 << pin->timer->COMnA1) | 
+					(1 << pin->timer->CSn0) |
+					(1 << pin->timer->CSn1);
+				break;
+				case PIN_66KHz:
+					*(pin->timer->TCCRnA) |= 
+					(1 << pin->timer->WGMn0) | 
+					(1 << pin->timer->WGMn1) | 
+					(1 << pin->timer->COMnA1) | 
+					(1 << pin->timer->CSn0);
+				break;
+			}
 			break;
 			
 		// Configuration for 16bit timers
 		case 16:
-			/*
-			// ~66KHz
-			*(pin->timer->TCCRnA) |= 
-				(1 << pin->timer->WGMn0) | 
-				(1 << pin->timer->COMnA1);
+			switch (frequency) {
+				case PIN_66KHz:
+					*(pin->timer->TCCRnA) |= 
+						(1 << pin->timer->WGMn0) | 
+						(1 << pin->timer->COMnA1);
+						
+					*(pin->timer->TCCRnB) |=
+						(1 << pin->timer->CSn0) |
+						(1 << pin->timer->WGMn2);
+						
+					clear_bit(*(pin->timer->TCCRnB), pin->timer->CSn1);
+				break;
 				
-			*(pin->timer->TCCRnB) |=
-				(1 << pin->timer->CSn0) |
-				(1 << pin->timer->WGMn2);
+				case PIN_1KHz:
+					*(pin->timer->TCCRnA) |= 
+						(1 << pin->timer->WGMn0) | 
+						(1 << pin->timer->COMnA1);
+						
+					*(pin->timer->TCCRnB) |=
+						(1 << pin->timer->CSn0) |
+						(1 << pin->timer->CSn1) |
+						(1 << pin->timer->WGMn2);
+				break;
 				
-			clear_bit(*(pin->timer->TCCRnB), pin->timer->CSn1);
-			*/
-			
-			// ~19.5KHz
-			*(pin->timer->TCCRnA) |= 
-				(1 << pin->timer->WGMn1) | 
-				(1 << pin->timer->COMnA1);
-				
-			*(pin->timer->TCCRnB) |=
-				(1 << pin->timer->CSn1) |
-				(1 << pin->timer->WGMn2) |
-				(1 << pin->timer->WGMn3);
-				
-			*(pin->timer->ICRn) = 100;
-			
-			// 1Khz
-			/*
-			*(pin->timer->TCCRnA) |= 
-				(1 << pin->timer->WGMn0) | 
-				(1 << pin->timer->COMnA1);
-				
-			*(pin->timer->TCCRnB) |=
-				(1 << pin->timer->CSn0) |
-				(1 << pin->timer->CSn1) |
-				(1 << pin->timer->WGMn2);
-			*/
+				case PIN_20KHz:
+					*(pin->timer->TCCRnA) |= 
+						(1 << pin->timer->WGMn1) | 
+						(1 << pin->timer->COMnA1);
+						
+					*(pin->timer->TCCRnB) |=
+						(1 << pin->timer->CSn1) |
+						(1 << pin->timer->WGMn2) |
+						(1 << pin->timer->WGMn3);
+						
+					*(pin->timer->ICRn) = 100;
+				break;
+			}
 			break;
 	}
 }
@@ -103,6 +123,21 @@ Timer Timer_1A = {
 	.bits = 16
 };
 
+// PB7
+Timer Timer_0A = {
+	.TCCRnA = &TCCR0A,
+	.OCRnA = &OCR0A,
+	.ICRn = 0,
+	.WGMn0 = WGM00,
+	.WGMn1 = WGM01,
+	.WGMn2 = 0,
+	.WGMn3 = 0,
+	.COMnA1 = COM0A1,
+	.CSn0 = CS00,
+	.CSn1 = CS01,
+	.bits = 8
+};
+
 // PB4
 Timer Timer_2A = {
 	.TCCRnA = &TCCR2A,
@@ -134,6 +169,15 @@ Pin Pin_B5 = {
 	.timer = &Timer_1A
 };
 
+
+Pin Pin_B7 = {
+	.DDRx = &DDRB,
+	.PORTx = &PORTB,
+	.PINx = &PINB,
+	.Pxn = PB7,
+	.timer = &Timer_0A
+};
+
 Pin Pin_B0 = {
 	.DDRx = &DDRB,
 	.PORTx = &PORTB,
@@ -154,7 +198,7 @@ Pin Pin_C6 = {
 	.DDRx = &DDRC,
 	.PORTx = &PORTC,
 	.PINx = &PINC,
-	.Pxn = PC2,
+	.Pxn = PC6,
 	.timer = NULL
 };
 

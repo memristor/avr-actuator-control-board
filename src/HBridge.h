@@ -23,7 +23,7 @@ typedef struct _HBridge {
 /**
  * @example HBridge_Add(&PinC0, &PinC1, &PinC2, 1101);
  */
-void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, uint16_t canId);
+void HBridge_Add(Pin* inA, Pin* inB, Pin* inH, PinFrequency frequency, uint16_t canId);
 
 bool HBridge_OnMessage(can_t* canMsg);
 

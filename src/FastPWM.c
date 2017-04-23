@@ -12,7 +12,7 @@ void FastPWM_Add(Pin* pin, uint16_t canId) {
    uint8_t index = instancesCount;
    
    Pin_SetMode(pin, PIN_OUTPUT);
-   Pin_EnableAnalog(pin);
+   Pin_EnableAnalog(pin, PIN_7KHz);
    
    instances[index].canId = canId;
    instances[index].pin = pin;
