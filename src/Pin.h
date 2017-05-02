@@ -76,6 +76,8 @@ extern Pin Pin_B7;
 extern Pin Pin_B4;
 extern Pin Pin_B0;
 extern Pin Pin_A2;
+extern Pin Pin_A1;
+extern Pin Pin_A0;
 extern Pin Pin_C6;
 extern Pin Pin_C7;
 extern Pin Pin_G2;
@@ -89,5 +91,7 @@ extern Pin Pin_C1;
 extern Pin Pin_C2;
 extern Pin Pin_C3;
 extern Pin Pin_C4;
+extern Pin Pin_F2;
+extern Pin Pin_F3;
 
 #endif  // _PIN_H_

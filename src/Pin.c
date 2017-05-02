@@ -194,6 +194,22 @@ Pin Pin_A2 = {
 	.timer = NULL
 };
 
+Pin Pin_A1 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA1,
+	.timer = NULL
+};
+
+Pin Pin_A0 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA0,
+	.timer = NULL
+};
+
 Pin Pin_C6 = {
 	.DDRx = &DDRC,
 	.PORTx = &PORTC,
@@ -295,6 +311,22 @@ Pin Pin_C4 = {
 	.PORTx = &PORTC,
 	.PINx = &PINC,
 	.Pxn = PC4,
+	.timer = NULL
+};
+
+Pin Pin_F2 = {
+	.DDRx = &DDRF,
+	.PORTx = &PORTF,
+	.PINx = &PINF,
+	.Pxn = PF4,
+	.timer = NULL
+};
+
+Pin Pin_F3 = {
+	.DDRx = &DDRF,
+	.PORTx = &PORTF,
+	.PINx = &PINF,
+	.Pxn = PF3,
 	.timer = NULL
 };
 

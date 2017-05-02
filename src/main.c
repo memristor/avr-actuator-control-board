@@ -43,6 +43,10 @@ int main(void) {
 	BinarySensor_Add(&Pin_A4, 0x00007F0F);
 	BinarySensor_Add(&Pin_A3, 0x00007F10);
 	BinarySensor_Add(&Pin_A2, 0x00007F11);
+	BinarySensor_Add(&Pin_A1, 0x00007F21);
+	BinarySensor_Add(&Pin_A0, 0x00007F22);
+	BinarySensor_Add(&Pin_F3, 0x00007F23);
+	BinarySensor_Add(&Pin_F2, 0x00007F24);
 
 	// PWMs
 	FastPWM_Add(&Pin_B7, 0x00007F12);
@@ -66,7 +70,7 @@ int main(void) {
 	
 	// Enable interrupts
     sei();
-
+    
     while (1) {
 		// AX12_UpdateAll();
 		BinarySensor_UpdateAll();

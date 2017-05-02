@@ -28,12 +28,12 @@ bool HBridge_OnMessage(can_t* canMsg) {
 			
 			switch(canMsg->data[1]) {
 				case 0: // Left
-					Pin_WriteDigital(instances[i].inA, PIN_LOW);
-					Pin_WriteDigital(instances[i].inB, PIN_HIGH);
-					break;
-				case 1:	// Right
 					Pin_WriteDigital(instances[i].inA, PIN_HIGH);
 					Pin_WriteDigital(instances[i].inB, PIN_LOW);
+					break;
+				case 1:	// Right
+					Pin_WriteDigital(instances[i].inA, PIN_LOW);
+					Pin_WriteDigital(instances[i].inB, PIN_HIGH);
 					break;
 				case 2:	// Stop
 					Pin_WriteDigital(instances[i].inA, PIN_HIGH);
