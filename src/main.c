@@ -16,7 +16,6 @@
 #include "Pin.h"
 
 MCP mcp;
-size_t i;
 
 int main(void) {
 	Utils_Init();
@@ -64,21 +63,17 @@ int main(void) {
         .mask = 0x0000FF00,    
         .flags = {
             .rtr = 0,
-            .extended = 0x3   
+            .extended = 0x03   
         }
     }; 
     
     // For all CANPAGE-s
-    for(i=0; i < 15; i++) { 
-        can_set_filter(i, &filter);        
-    }
+    can_set_filter(0, &filter);        
     
 	// Enable interrupts
     sei();
     
     while (1) {
-        
-        
 		// AX12_UpdateAll();
 		BinarySensor_UpdateAll();
 
@@ -88,7 +83,8 @@ int main(void) {
 			
             // Try to read the message
             if (can_get_message(&msg)) {
-		//		if (msg.id == 0xff) continue; // Ignore lidar messages
+				// can_wrapper_send(9999, 1, 1);
+				// if (msg.id == 0xff) continue; // Ignore lidar messages
 											
 				// TODO: Implement binary search tree
 				if (AX12_OnMessage(&msg) == true) continue;
