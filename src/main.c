@@ -59,19 +59,23 @@ int main(void) {
 	// Init CAN bus
 	can_init(BITRATE_500_KBPS);
 	can_filter_t filter = {
-        .id = 0,
-        .mask = 0,
+        .id = 0x00007F00,     //ispravljeno sa 0
+        .mask = 0x0000FF00,     // ispravljeno sa 0
         .flags = {
             .rtr = 0,
-            .extended = 0
+            .extended = 0x3   //ispravljeno sa 0 na 0x3 : 00 -> 11
         }
-    };
-    can_set_filter(0, &filter);
-	
+    }; 
+    int i;
+//     for(i=0;i<15;i++){      //for loop for all 15 can pages
+        can_set_filter(i, &filter);        //ispravljeno sa 0 -> 14
+    }
 	// Enable interrupts
     sei();
     
     while (1) {
+        
+        
 		// AX12_UpdateAll();
 		BinarySensor_UpdateAll();
 
@@ -80,7 +84,8 @@ int main(void) {
             can_t msg;
 			
             // Try to read the message
-            if (can_get_message(&msg)) {	
+            if (can_get_message(&msg)) {
+            //    can_wrapper_send(0x00009999,1,1); //just for debug if can filter work propertly
 				if (msg.id == 0xff) continue; // Ignore lidar messages
 											
 				// TODO: Implement binary search tree

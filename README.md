@@ -3,7 +3,7 @@
 ## Cross-compilation
 Install required packages  
 - Debian (Ubuntu) `sudo apt-get install binutils-avr gcc-avr avr-libc avrdude`
-- Arch `sudo pacman install avr-binutils avr-gcc avr-libc avrdude`
+- Arch `sudo pacman -S avr-binutils avr-gcc avr-libc avrdude`
 
 and run
 ```
