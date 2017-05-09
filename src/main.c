@@ -67,7 +67,7 @@ int main(void) {
         }
     }; 
     int i;
-//     for(i=0;i<15;i++){      //for loop for all 15 can pages
+     for(i=0;i<15;i++){      //for loop for all 15 can pages
         can_set_filter(i, &filter);        //ispravljeno sa 0 -> 14
     }
 	// Enable interrupts
