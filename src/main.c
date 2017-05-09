@@ -16,6 +16,7 @@
 #include "Pin.h"
 
 MCP mcp;
+size_t i;
 
 int main(void) {
 	Utils_Init();
@@ -59,17 +60,19 @@ int main(void) {
 	// Init CAN bus
 	can_init(BITRATE_500_KBPS);
 	can_filter_t filter = {
-        .id = 0x00007F00,     //ispravljeno sa 0
-        .mask = 0x0000FF00,     // ispravljeno sa 0
+        .id = 0x00007F00,     
+        .mask = 0x0000FF00,    
         .flags = {
             .rtr = 0,
-            .extended = 0x3   //ispravljeno sa 0 na 0x3 : 00 -> 11
+            .extended = 0x3   
         }
     }; 
-    int i;
-     for(i=0;i<15;i++){      //for loop for all 15 can pages
-        can_set_filter(i, &filter);        //ispravljeno sa 0 -> 14
+    
+    // For all CANPAGE-s
+    for(i=0; i < 15; i++) { 
+        can_set_filter(i, &filter);        
     }
+    
 	// Enable interrupts
     sei();
     
@@ -85,8 +88,7 @@ int main(void) {
 			
             // Try to read the message
             if (can_get_message(&msg)) {
-            //    can_wrapper_send(0x00009999,1,1); //just for debug if can filter work propertly
-				if (msg.id == 0xff) continue; // Ignore lidar messages
+		//		if (msg.id == 0xff) continue; // Ignore lidar messages
 											
 				// TODO: Implement binary search tree
 				if (AX12_OnMessage(&msg) == true) continue;
