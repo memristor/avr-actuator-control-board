@@ -24,6 +24,7 @@ bool RX24_OnMessage(can_t* canMsg) {
 		memcpy(txpacket + 2, canMsg->data, canMsg->length);
 		status = dynamixel_rx_txrx(txpacket, rxpacket);
 		
+		return true;
 		// Get a response from AX12 (Brain <- AX12)
 		can_t msg;
 		msg.id = CAN_ID;

@@ -88,6 +88,11 @@ void dynamixel_rx_init(void) {
 	UCSR1B |= (1 << RXEN1);
 	UCSR1B |= (1 << RXCIE1);
 	
+	DDRD |= (1 << PD2);
+	DDRD |= (1 << PD3);
+	DDRE |= (1 << PE2);
+	
+	PORTE |= (1 << PE2);
 	// Reset rx index
 	rx_buffer_index = 0;
 }
@@ -123,6 +128,17 @@ void ax_write(uint8_t c) {
 	UDR0 = c;
 }
 
+void rx_setrx(void) {
+	while(bit_is_clear(UCSR1A, TXC1));
+	// PORTE &= ~(1 << PE2);
+	rx_buffer_index = 0;
+}
+
+void rx_settx(void) {
+	//while(bit_is_clear(UCSR1A, TXC1));
+	PORTE |= (1 << PE2);
+}
+
 void rx_write(uint8_t c) {
 	while(bit_is_clear(UCSR1A, UDRE1));
 	UDR1 = c;
@@ -144,6 +160,7 @@ uint8_t readpacket(
 	volatile uint8_t* recv_buffer,
 	volatile uint8_t* recv_buffer_index
 	) {
+		
 	uint16_t ulcounter = 0;
 	size_t i;
 
@@ -218,10 +235,12 @@ uint8_t dynamixel_rx_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket
 	txpacket[1] = (uint8_t) 0xff;
 	txpacket[txlength - 1] = (uint8_t)calculatechecksum(txpacket);
 	
+	rx_settx();
 	// Write packet	
 	for(uint8_t i = 0; i < txlength; i++) {
 		rx_write(txpacket[i]);
 	}
+	rx_setrx();
 	
 	// Read response
 	if(txpacket[DYNAMIXEL_ID] != DYNAMIXEL_BROADCAST_ID) {	
@@ -231,7 +250,6 @@ uint8_t dynamixel_rx_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket
 		else {
 			rxlength = 6;
 		}
-
 		return readpacket(rxpacket, rxlength, rx_buffer, &rx_buffer_index);
 	}
 		
