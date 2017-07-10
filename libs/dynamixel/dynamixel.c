@@ -47,6 +47,7 @@ ISR(USART0_RX_vect) {
 	}
 }
 
+/*
 ISR(USART1_RX_vect) {
 	rx_buffer[rx_buffer_index] = UDR1;
 	if (rx_buffer_index < DYNAMIXEL_PACKET_SIZE - 1) {
@@ -58,6 +59,7 @@ ISR(USART1_RX_vect) {
 		rx_buffer_index = 0;
 	}
 }
+*/
 
 void dynamixel_ax_init(void) {
 	// Set UART baudrate

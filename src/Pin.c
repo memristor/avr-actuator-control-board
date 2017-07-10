@@ -1,7 +1,12 @@
 #include "Pin.h"
 
+ISR(USART1_RX_vect) {
+	
+}
 
 void Pin_SetMode(Pin* pin, PinMode mode) {
+	__vector_32 a = USART1_RX_vect;
+	
 	if (mode == PIN_INPUT) {
 		// Set pull-up resistor
 		set_bit(*(pin->PORTx), pin->Pxn);
@@ -18,13 +23,6 @@ void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 		// Configuration for 8bit timers
 		case 8:
 			switch (frequency) {
-				case PIN_7KHz:
-					*(pin->timer->TCCRnA) |= 
-						(1 << pin->timer->WGMn0) | 
-						(1 << pin->timer->WGMn1) | 
-						(1 << pin->timer->COMnA1) | 
-						(1 << pin->timer->CSn1);
-				break;
 				case PIN_1KHz:
 					*(pin->timer->TCCRnA) |= 
 					(1 << pin->timer->WGMn0) | 
@@ -32,32 +30,33 @@ void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 					(1 << pin->timer->COMnA1) | 
 					(1 << pin->timer->CSn0) |
 					(1 << pin->timer->CSn1);
-				break;
+					break;
+					
+				case PIN_7KHz:
+					*(pin->timer->TCCRnA) |= 
+						(1 << pin->timer->WGMn0) | 
+						(1 << pin->timer->WGMn1) | 
+						(1 << pin->timer->COMnA1) | 
+						(1 << pin->timer->CSn1);
+					break;
+					
+				case PIN_20KHz:
+					// Not implemented
+					break;
+					
 				case PIN_66KHz:
 					*(pin->timer->TCCRnA) |= 
 					(1 << pin->timer->WGMn0) | 
 					(1 << pin->timer->WGMn1) | 
 					(1 << pin->timer->COMnA1) | 
 					(1 << pin->timer->CSn0);
-				break;
+					break;
 			}
 			break;
 			
 		// Configuration for 16bit timers
 		case 16:
 			switch (frequency) {
-				case PIN_66KHz:
-					*(pin->timer->TCCRnA) |= 
-						(1 << pin->timer->WGMn0) | 
-						(1 << pin->timer->COMnA1);
-						
-					*(pin->timer->TCCRnB) |=
-						(1 << pin->timer->CSn0) |
-						(1 << pin->timer->WGMn2);
-						
-					clear_bit(*(pin->timer->TCCRnB), pin->timer->CSn1);
-				break;
-				
 				case PIN_1KHz:
 					*(pin->timer->TCCRnA) |= 
 						(1 << pin->timer->WGMn0) | 
@@ -67,8 +66,12 @@ void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 						(1 << pin->timer->CSn0) |
 						(1 << pin->timer->CSn1) |
 						(1 << pin->timer->WGMn2);
-				break;
-				
+					break;
+					
+				case PIN_7KHz:
+					// Not implemented
+					break;
+					
 				case PIN_20KHz:
 					*(pin->timer->TCCRnA) |= 
 						(1 << pin->timer->WGMn1) | 
@@ -80,10 +83,32 @@ void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 						(1 << pin->timer->WGMn3);
 						
 					*(pin->timer->ICRn) = 100;
-				break;
+					break;
+				
+				case PIN_66KHz:
+					*(pin->timer->TCCRnA) |= 
+						(1 << pin->timer->WGMn0) | 
+						(1 << pin->timer->COMnA1);
+						
+					*(pin->timer->TCCRnB) |=
+						(1 << pin->timer->CSn0) |
+						(1 << pin->timer->WGMn2);
+						
+					clear_bit(*(pin->timer->TCCRnB), pin->timer->CSn1);
+					break;
 			}
 			break;
 	}
+}
+
+void Uart_Init(Uart* uart, uint32_t baudrate) {
+	*uart->UBRRnH = ((F_CPU / 8 + baudrate / 2) / baudrate - 1) >> 8;
+	*uart->UBRRnH = ((F_CPU / 8 + baudrate / 2) / baudrate - 1);
+	*uart->UCSRnA |= (1 << uart->U2Xn);
+	
+	*uart->UCSRnB |= (1 << uart->TXENn);	// Enable sending
+	*uart->UCSRnB |= (1 << uart->RXENn);	// Enable receiving
+	*uart->UCSRnB |= (1 << uart->RXCIEn);	// Enable receiving interrupt
 }
 
 void Pin_WriteAnalog(Pin* pin, uint16_t value) {
@@ -91,7 +116,6 @@ void Pin_WriteAnalog(Pin* pin, uint16_t value) {
 }
 
 void Pin_WriteDigital(Pin* pin, PinValue value) {
-	// TODO: Implement without condition
 	if (value == PIN_HIGH) {
 		set_bit(*(pin->PORTx), pin->Pxn);
 	} else {
@@ -126,7 +150,7 @@ Timer Timer_1A = {
 // PB7
 Timer Timer_0A = {
 	.TCCRnA = &TCCR0A,
-	.OCRnA = &OCR0A,
+	.OCRnA = (uint16_t *)&OCR0A,
 	.ICRn = 0,
 	.WGMn0 = WGM00,
 	.WGMn1 = WGM01,
@@ -141,7 +165,7 @@ Timer Timer_0A = {
 // PB4
 Timer Timer_2A = {
 	.TCCRnA = &TCCR2A,
-	.OCRnA = &OCR2A,
+	.OCRnA = (uint16_t *)&OCR2A,
 	.ICRn = 0,
 	.WGMn0 = WGM20,
 	.WGMn1 = WGM21,

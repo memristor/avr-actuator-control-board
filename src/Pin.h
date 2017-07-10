@@ -2,9 +2,22 @@
 #define _PIN_H_
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include "Utils.h"
+
+typedef struct _Uart {
+	volatile uint8_t* UBRRnH;
+	volatile uint8_t* UBRRnL;
+	volatile uint8_t* UCSRnA;
+	volatile uint8_t* UCSRnB;
+	volatile uint8_t* USARTn_RX_vect;
+	uint8_t U2Xn;
+	uint8_t TXENn;
+	uint8_t RXENn;
+	uint8_t RXCIEn;
+} Uart;
 
 typedef struct _Timer {
 	volatile uint8_t* TCCRnA;
@@ -45,6 +58,8 @@ typedef enum _PinFrequency {
 	PIN_20KHz,
 	PIN_66KHz,
 } PinFrequency;
+
+void Uart_Init(Uart* uart, uint32_t baudrate);
 
 /**
  * @example Pin_SetMode(&Pin_B5, PIN_OUTPUT);
