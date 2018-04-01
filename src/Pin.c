@@ -19,66 +19,66 @@ void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 		case 8:
 			switch (frequency) {
 				case PIN_7KHz:
-					*(pin->timer->TCCRnA) |= 
-						(1 << pin->timer->WGMn0) | 
-						(1 << pin->timer->WGMn1) | 
-						(1 << pin->timer->COMnA1) | 
+					*(pin->timer->TCCRnA) |=
+						(1 << pin->timer->WGMn0) |
+						(1 << pin->timer->WGMn1) |
+						(1 << pin->timer->COMnA1) |
 						(1 << pin->timer->CSn1);
 				break;
 				case PIN_1KHz:
-					*(pin->timer->TCCRnA) |= 
-					(1 << pin->timer->WGMn0) | 
-					(1 << pin->timer->WGMn1) | 
-					(1 << pin->timer->COMnA1) | 
+					*(pin->timer->TCCRnA) |=
+					(1 << pin->timer->WGMn0) |
+					(1 << pin->timer->WGMn1) |
+					(1 << pin->timer->COMnA1) |
 					(1 << pin->timer->CSn0) |
 					(1 << pin->timer->CSn1);
 				break;
 				case PIN_66KHz:
-					*(pin->timer->TCCRnA) |= 
-					(1 << pin->timer->WGMn0) | 
-					(1 << pin->timer->WGMn1) | 
-					(1 << pin->timer->COMnA1) | 
+					*(pin->timer->TCCRnA) |=
+					(1 << pin->timer->WGMn0) |
+					(1 << pin->timer->WGMn1) |
+					(1 << pin->timer->COMnA1) |
 					(1 << pin->timer->CSn0);
 				break;
 			}
 			break;
-			
+
 		// Configuration for 16bit timers
 		case 16:
 			switch (frequency) {
 				case PIN_66KHz:
-					*(pin->timer->TCCRnA) |= 
-						(1 << pin->timer->WGMn0) | 
+					*(pin->timer->TCCRnA) |=
+						(1 << pin->timer->WGMn0) |
 						(1 << pin->timer->COMnA1);
-						
+
 					*(pin->timer->TCCRnB) |=
 						(1 << pin->timer->CSn0) |
 						(1 << pin->timer->WGMn2);
-						
+
 					clear_bit(*(pin->timer->TCCRnB), pin->timer->CSn1);
 				break;
-				
+
 				case PIN_1KHz:
-					*(pin->timer->TCCRnA) |= 
-						(1 << pin->timer->WGMn0) | 
+					*(pin->timer->TCCRnA) |=
+						(1 << pin->timer->WGMn0) |
 						(1 << pin->timer->COMnA1);
-						
+
 					*(pin->timer->TCCRnB) |=
 						(1 << pin->timer->CSn0) |
 						(1 << pin->timer->CSn1) |
 						(1 << pin->timer->WGMn2);
 				break;
-				
+
 				case PIN_20KHz:
-					*(pin->timer->TCCRnA) |= 
-						(1 << pin->timer->WGMn1) | 
+					*(pin->timer->TCCRnA) |=
+						(1 << pin->timer->WGMn1) |
 						(1 << pin->timer->COMnA1);
-						
+
 					*(pin->timer->TCCRnB) |=
 						(1 << pin->timer->CSn1) |
 						(1 << pin->timer->WGMn2) |
 						(1 << pin->timer->WGMn3);
-						
+
 					*(pin->timer->ICRn) = 100;
 				break;
 			}
@@ -153,6 +153,95 @@ Timer Timer_2A = {
 	.bits = 8
 };
 
+Pin Pin_A0 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA0,
+	.timer = NULL
+};
+
+Pin Pin_A1 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA1,
+	.timer = NULL
+};
+
+Pin Pin_A2 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA2,
+	.timer = NULL
+};
+
+Pin Pin_A3 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA3,
+	.timer = NULL
+};
+
+Pin Pin_A4 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA4,
+	.timer = NULL
+};
+
+Pin Pin_A5 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA5,
+	.timer = NULL
+};
+
+Pin Pin_A6 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA6,
+	.timer = NULL
+};
+
+Pin Pin_A7 = {
+	.DDRx = &DDRA,
+	.PORTx = &PORTA,
+	.PINx = &PINA,
+	.Pxn = PA7,
+	.timer = NULL
+};
+
+
+Pin Pin_B0 = {
+	.DDRx = &DDRB,
+	.PORTx = &PORTB,
+	.PINx = &PINB,
+	.Pxn = PB0,
+	.timer = NULL
+};
+
+Pin Pin_B2 = {
+	.DDRx = &DDRB,
+	.PORTx = &PORTB,
+	.PINx = &PINB,
+	.Pxn = PB2,
+	.timer = NULL
+};
+
+Pin Pin_B3 = {
+	.DDRx = &DDRB,
+	.PORTx = &PORTB,
+	.PINx = &PINB,
+	.Pxn = PB3,
+	.timer = NULL
+};
+
 Pin Pin_B4 = {
 	.DDRx = &DDRB,
 	.PORTx = &PORTB,
@@ -169,7 +258,6 @@ Pin Pin_B5 = {
 	.timer = &Timer_1A
 };
 
-
 Pin Pin_B7 = {
 	.DDRx = &DDRB,
 	.PORTx = &PORTB,
@@ -178,101 +266,6 @@ Pin Pin_B7 = {
 	.timer = &Timer_0A
 };
 
-Pin Pin_B0 = {
-	.DDRx = &DDRB,
-	.PORTx = &PORTB,
-	.PINx = &PINB,
-	.Pxn = PB0,
-	.timer = NULL
-};
-
-Pin Pin_A2 = {
-	.DDRx = &DDRA,
-	.PORTx = &PORTA,
-	.PINx = &PINA,
-	.Pxn = PA2,
-	.timer = NULL
-};
-
-Pin Pin_A1 = {
-	.DDRx = &DDRA,
-	.PORTx = &PORTA,
-	.PINx = &PINA,
-	.Pxn = PA1,
-	.timer = NULL
-};
-
-Pin Pin_A0 = {
-	.DDRx = &DDRA,
-	.PORTx = &PORTA,
-	.PINx = &PINA,
-	.Pxn = PA0,
-	.timer = NULL
-};
-
-Pin Pin_C6 = {
-	.DDRx = &DDRC,
-	.PORTx = &PORTC,
-	.PINx = &PINC,
-	.Pxn = PC6,
-	.timer = NULL
-};
-
-Pin Pin_C7 = {
-	.DDRx = &DDRC,
-	.PORTx = &PORTC,
-	.PINx = &PINC,
-	.Pxn = PC7,
-	.timer = NULL
-};
-
-Pin Pin_G2 = {
-	.DDRx = &DDRG,
-	.PORTx = &PORTG,
-	.PINx = &PING,
-	.Pxn = PG2,
-	.timer = NULL
-};
-
-Pin Pin_A7 = {
-	.DDRx = &DDRA,
-	.PORTx = &PORTA,
-	.PINx = &PINA,
-	.Pxn = PA7,
-	.timer = NULL
-};
-
-Pin Pin_A6 = {
-	.DDRx = &DDRA,
-	.PORTx = &PORTA,
-	.PINx = &PINA,
-	.Pxn = PA6,
-	.timer = NULL
-};
-
-Pin Pin_A5 = {
-	.DDRx = &DDRA,
-	.PORTx = &PORTA,
-	.PINx = &PINA,
-	.Pxn = PA5,
-	.timer = NULL
-};
-
-Pin Pin_A4 = {
-	.DDRx = &DDRA,
-	.PORTx = &PORTA,
-	.PINx = &PINA,
-	.Pxn = PA4,
-	.timer = NULL
-};
-
-Pin Pin_A3 = {
-	.DDRx = &DDRA,
-	.PORTx = &PORTA,
-	.PINx = &PINA,
-	.Pxn = PA3,
-	.timer = NULL
-};
 
 Pin Pin_C0 = {
 	.DDRx = &DDRC,
@@ -314,6 +307,48 @@ Pin Pin_C4 = {
 	.timer = NULL
 };
 
+Pin Pin_C5 = {
+	.DDRx = &DDRC,
+	.PORTx = &PORTC,
+	.PINx = &PINC,
+	.Pxn = PC5,
+	.timer = NULL
+};
+
+Pin Pin_C6 = {
+	.DDRx = &DDRC,
+	.PORTx = &PORTC,
+	.PINx = &PINC,
+	.Pxn = PC6,
+	.timer = NULL
+};
+
+Pin Pin_C7 = {
+	.DDRx = &DDRC,
+	.PORTx = &PORTC,
+	.PINx = &PINC,
+	.Pxn = PC7,
+	.timer = NULL
+};
+
+
+Pin Pin_E2 = {
+	.DDRx = &DDRE,
+	.PORTx = &PORTE,
+	.PINx = &PINE,
+	.Pxn = PE2,
+	.timer = NULL
+};
+
+Pin Pin_E3 = {
+	.DDRx = &DDRE,
+	.PORTx = &PORTE,
+	.PINx = &PINE,
+	.Pxn = PE3,
+	.timer = NULL
+};
+
+
 Pin Pin_F2 = {
 	.DDRx = &DDRF,
 	.PORTx = &PORTF,
@@ -330,3 +365,11 @@ Pin Pin_F3 = {
 	.timer = NULL
 };
 
+
+Pin Pin_G2 = {
+	.DDRx = &DDRG,
+	.PORTx = &PORTG,
+	.PINx = &PING,
+	.Pxn = PG2,
+	.timer = NULL
+};

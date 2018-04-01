@@ -71,27 +71,37 @@ void Pin_WriteDigital(Pin* pin, PinValue value);
  */
 PinValue Pin_ReadDigital(Pin* pin);
 
+extern Pin Pin_A0;
+extern Pin Pin_A1;
+extern Pin Pin_A2;
+extern Pin Pin_A3;
+extern Pin Pin_A4;
+extern Pin Pin_A5;
+extern Pin Pin_A6;
+extern Pin Pin_A7;
+
+extern Pin Pin_B0;
+extern Pin Pin_B2;
+extern Pin Pin_B3;
+extern Pin Pin_B4;
 extern Pin Pin_B5;
 extern Pin Pin_B7;
-extern Pin Pin_B4;
-extern Pin Pin_B0;
-extern Pin Pin_A2;
-extern Pin Pin_A1;
-extern Pin Pin_A0;
-extern Pin Pin_C6;
-extern Pin Pin_C7;
-extern Pin Pin_G2;
-extern Pin Pin_A7;
-extern Pin Pin_A6;
-extern Pin Pin_A5;
-extern Pin Pin_A4;
-extern Pin Pin_A3;
+
 extern Pin Pin_C0;
 extern Pin Pin_C1;
 extern Pin Pin_C2;
 extern Pin Pin_C3;
 extern Pin Pin_C4;
+extern Pin Pin_C5;
+extern Pin Pin_C6;
+extern Pin Pin_C7;
+
+extern Pin Pin_E2;
+extern Pin Pin_E3;
+
 extern Pin Pin_F2;
 extern Pin Pin_F3;
+
+extern Pin Pin_G2;
 
 #endif  // _PIN_H_
