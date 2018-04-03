@@ -1,8 +1,16 @@
 #include "VacuumPumps.h"
 
-
+static uint16_t timer = 0;
 static VacuumPump instances[VACUUM_PUMP_CONFIG_COUNT_MAX];
 static uint8_t count = 0;
+
+ISR(TIMER0_COMP){
+
+  if(timer >= 0) {
+    timer --;
+  }
+
+}
 
 void VacuumPump_Add(Pin* pumpPin, Pin* switchPin, uint8_t number) {
 
