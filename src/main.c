@@ -1,3 +1,4 @@
+#define DEBUG
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -9,14 +10,7 @@
 #include "VacuumPumps.h"
 
 
-
 int main() {
-
-	TCCR0A = 0x00;
-	TCCR0A |= (1 << WGM01) | (1 << CS02);
-	OCR0A = 30;
-	TIMSK0 |= (1 << OCIE0A);
-
 
 #ifdef DEBUG
 	char uart_char1, uart_char2;
@@ -29,7 +23,6 @@ int main() {
 
 	/* CANbus Initialisation */
 	CANbus_Init();
-
 
 	/*	Vacuum Pump and Vacuum Switches Initialisation	*/
 	/*	Function:	VacuumPump_Add(&pumpPin, &switchPin, number)*/
@@ -46,14 +39,15 @@ int main() {
 
   while(1) {
 
-
-		//can_wrapper_send(0x0000FFFF, 1, 0xFF);
-
 		if (can_check_message()) {
 			can_t msg;
 
 			if (can_get_message(&msg)) {
+
+#ifdef DEBUG
 				USART0_transmit('c');
+#endif
+
 				if(VacuumPump_OnMessage(&msg) == true) continue;
 
 			}

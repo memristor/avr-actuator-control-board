@@ -1,11 +1,12 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#ifndef F_CPU
 #define F_CPU 16000000UL
+#endif
 
 #define CANBUS_BITRATE BITRATE_500_KBPS
-#define BRUSHLESS_CANID 0x00008D53
+#define CAN_FILTER_ID 0x00006C00
 #define VACUUM_PUMP_CANID 0x00006C10
-#define CAN_FILTER_ID
 
 #endif

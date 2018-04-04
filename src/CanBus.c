@@ -6,7 +6,7 @@ void CANbus_Init(void) {
 
   // CANbus filters Initialisation for id and mask
   can_filter_t filter = {
-      .id = 0x00006C00,
+      .id = CAN_FILTER_ID,
       .mask = 0x0000FF00,
       .flags = {
           .rtr = 0,
