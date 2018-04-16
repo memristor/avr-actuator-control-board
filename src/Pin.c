@@ -49,7 +49,8 @@ void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 				case PIN_66KHz:
 					*(pin->timer->TCCRnA) |=
 						(1 << pin->timer->WGMn0) |
-						(1 << pin->timer->COMnA1);
+						(1 << pin->timer->COMnA1) |
+						(1 << pin->timer->COMnB1);
 
 					*(pin->timer->TCCRnB) |=
 						(1 << pin->timer->CSn0) |
@@ -61,7 +62,8 @@ void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 				case PIN_1KHz:
 					*(pin->timer->TCCRnA) |=
 						(1 << pin->timer->WGMn0) |
-						(1 << pin->timer->COMnA1);
+						(1 << pin->timer->COMnA1) |
+						(1 << pin->timer->COMnB1);
 
 					*(pin->timer->TCCRnB) |=
 						(1 << pin->timer->CSn0) |
@@ -72,7 +74,8 @@ void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 				case PIN_20KHz:
 					*(pin->timer->TCCRnA) |=
 						(1 << pin->timer->WGMn1) |
-						(1 << pin->timer->COMnA1);
+						(1 << pin->timer->COMnA1) |
+						(1 << pin->timer->COMnB1);
 
 					*(pin->timer->TCCRnB) |=
 						(1 << pin->timer->CSn1) |
@@ -87,7 +90,7 @@ void Pin_EnableAnalog(Pin* pin, PinFrequency frequency) {
 }
 
 void Pin_WriteAnalog(Pin* pin, uint16_t value) {
-	*(pin->timer->OCRnA) = value;
+	*(pin->timer->OCRn) = value;
 }
 
 void Pin_WriteDigital(Pin* pin, PinValue value) {
@@ -107,26 +110,10 @@ PinValue Pin_ReadDigital(Pin* pin) {
 	}
 }
 
-// PB5
-Timer Timer_1A = {
-	.TCCRnA = &TCCR1A,
-	.TCCRnB = &TCCR1B,
-	.OCRnA = &OCR1A,
-	.ICRn = &ICR1,
-	.WGMn0 = WGM10,
-	.WGMn1 = WGM11,
-	.WGMn2 = WGM12,
-	.WGMn3 = WGM13,
-	.COMnA1 = COM1A1,
-	.CSn0 = CS10,
-	.CSn1 = CS11,
-	.bits = 16
-};
-
 // PB7
 Timer Timer_0A = {
 	.TCCRnA = &TCCR0A,
-	.OCRnA = &OCR0A,
+	.OCRn = &OCR0A,
 	.ICRn = 0,
 	.WGMn0 = WGM00,
 	.WGMn1 = WGM01,
@@ -138,15 +125,58 @@ Timer Timer_0A = {
 	.bits = 8
 };
 
+// PB5
+Timer Timer_1A = {
+	.TCCRnA = &TCCR1A,
+	.TCCRnB = &TCCR1B,
+	.OCRn = &OCR1A,
+	.ICRn = &ICR1,
+	.WGMn0 = WGM10,
+	.WGMn1 = WGM11,
+	.WGMn2 = WGM12,
+	.WGMn3 = WGM13,
+	.COMnA0 = COM1A0,
+	.COMnA1 = COM1A1,
+	.COMnB0 = COM1B0,
+	.COMnB1 = COM1B1,
+	.COMnC0 = COM1C0,
+	.COMnC1 = COM1C1,
+	.CSn0 = CS10,
+	.CSn1 = CS11,
+	.bits = 16
+};
+
+// PB6
+Timer Timer_1B = {
+	.TCCRnA = &TCCR1A,
+	.TCCRnB = &TCCR1B,
+	.OCRn = &OCR1B,
+	.ICRn = &ICR1,
+	.WGMn0 = WGM10,
+	.WGMn1 = WGM11,
+	.WGMn2 = WGM12,
+	.WGMn3 = WGM13,
+	.COMnA0 = COM1A0,
+	.COMnA1 = COM1A1,
+	.COMnB0 = COM1B0,
+	.COMnB1 = COM1B1,
+	.COMnC0 = COM1C0,
+	.COMnC1 = COM1C1,
+	.CSn0 = CS10,
+	.CSn1 = CS11,
+	.bits = 16
+};
+
 // PB4
 Timer Timer_2A = {
 	.TCCRnA = &TCCR2A,
-	.OCRnA = &OCR2A,
+	.OCRn = &OCR2A,
 	.ICRn = 0,
 	.WGMn0 = WGM20,
 	.WGMn1 = WGM21,
 	.WGMn2 = 0,
 	.WGMn3 = 0,
+	.COMnA0 = COM2A0,
 	.COMnA1 = COM2A1,
 	.CSn0 = CS20,
 	.CSn1 = CS21,
@@ -256,6 +286,14 @@ Pin Pin_B5 = {
 	.PINx = &PINB,
 	.Pxn = PB5,
 	.timer = &Timer_1A
+};
+
+Pin Pin_B6 = {
+	.DDRx = &DDRB,
+	.PORTx = &PORTB,
+	.PINx = &PINB,
+	.Pxn = PB6,
+	.timer = &Timer_1B
 };
 
 Pin Pin_B7 = {

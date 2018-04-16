@@ -3,7 +3,7 @@
 static uint16_t timer = 0;
 static VacuumPump instances[VACUUM_PUMP_CONFIG_COUNT_MAX];
 static uint8_t count = 0;
-// 
+//
 // ISR(TIMER0_COMP){
 //
 //   if(timer >= 0) {
@@ -47,6 +47,7 @@ bool VacuumPump_OnMessage(can_t* canMsg) {
 
 				case 1:
 					Pin_WriteDigital(instances[i].pumpPin, PIN_HIGH);
+          Pin_WriteDigital(instances[i].switchPin, PIN_LOW);
 					break;
 
 			}

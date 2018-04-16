@@ -9,13 +9,18 @@
 typedef struct _Timer {
 	volatile uint8_t* TCCRnA;
 	volatile uint8_t* TCCRnB;
-	volatile uint16_t* OCRnA;
+	volatile uint16_t* OCRn;
 	volatile uint16_t* ICRn;
 	uint8_t WGMn0;
 	uint8_t WGMn1;
 	uint8_t WGMn2;
 	uint8_t WGMn3;
+	uint8_t COMnA0;
 	uint8_t COMnA1;
+	uint8_t COMnB0;
+	uint8_t COMnB1;
+	uint8_t COMnC0;
+	uint8_t COMnC1;
 	uint8_t CSn0;
 	uint8_t CSn1;
 	uint8_t bits;
@@ -85,6 +90,7 @@ extern Pin Pin_B2;
 extern Pin Pin_B3;
 extern Pin Pin_B4;
 extern Pin Pin_B5;
+extern Pin Pin_B6;
 extern Pin Pin_B7;
 
 extern Pin Pin_C0;
