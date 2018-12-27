@@ -68,7 +68,6 @@ F_CPU =  16000000
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
 
-
 # Target file name (without extension).
 TARGET = actuator_control_board
 
@@ -80,14 +79,17 @@ OBJDIR = build
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = ./src/Utils.c ./src/Pin.c ./src/main.c ./src/VacuumPumps.c ./src/CanBus.c ./src/Uart.c ./src/HBridge.c
+# SRC = ./src/Utils.c ./src/Pin.c ./boards/main.c ./src/VacuumPumps.c ./src/CanBus.c ./src/Uart.c ./src/HBridge.c
+# SRC = ./src/*.c ./libs/can/*.c ./libs/dynamixel/*.c
+# SRC += ./boards/main.c
 
 # Libs here
-SRC += ./libs/can/can_wrapper.c ./libs/dynamixel/dynamixel.c
+SRC = $(wildcard ./src/*.c ./libs/**/*.c)
+SRC += ./boards/$(TARGET).c
+
 
 # Dirs where .o files will be stored
-BUILD_DIRS = ./build/src ./build/libs/can ./build/libs/dynamixel
-
+BUILD_DIRS = $(addprefix ./build/, $(sort $(dir $(SRC))))
 
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC =
