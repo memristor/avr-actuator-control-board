@@ -113,7 +113,7 @@ PinValue Pin_ReadDigital(Pin* pin) {
 // PB7
 Timer Timer_0A = {
 	.TCCRnA = &TCCR0A,
-	.OCRn = &OCR0A,
+	.OCRn = (volatile uint16_t *)&OCR0A,
 	.ICRn = 0,
 	.WGMn0 = WGM00,
 	.WGMn1 = WGM01,
@@ -170,7 +170,7 @@ Timer Timer_1B = {
 // PB4
 Timer Timer_2A = {
 	.TCCRnA = &TCCR2A,
-	.OCRn = &OCR2A,
+	.OCRn = (volatile uint16_t *)&OCR2A,
 	.ICRn = 0,
 	.WGMn0 = WGM20,
 	.WGMn1 = WGM21,

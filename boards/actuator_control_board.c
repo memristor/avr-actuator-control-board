@@ -8,7 +8,7 @@
 #include "VacuumPumps.h"
 #include "HBridge.h"
 
-int main() {
+int main(int argc, char const *argv[]) {
 
 #ifdef DEBUG
 	char uart_char1, uart_char2;
