@@ -22,16 +22,18 @@ int main() {
 	sei();
 
 	/*	AX12 Servos Initialisation	*/
-	AX12_InitAll(0x00007F00);
+	AX12_InitAll(0x8d00);
 
 	/*	Binary Sensors Initalisation	*/
-	BinarySensor_Add(&Pin_C6, 1);
-	BinarySensor_Add(&Pin_A2, 2);
-	BinarySensor_Add(&Pin_A3, 3);
-	BinarySensor_Add(&Pin_A4, 4);
-	BinarySensor_Add(&Pin_A5, 5);
-	BinarySensor_Add(&Pin_A6, 6);
-	BinarySensor_Add(&Pin_A7, 7);
+	BinarySensor_Add(&Pin_C6, 0x8d01);
+	BinarySensor_Add(&Pin_A2, 0x8d02);
+	BinarySensor_Add(&Pin_A3, 0x8d03);
+	BinarySensor_Add(&Pin_A4, 0x8d04);
+	BinarySensor_Add(&Pin_A5, 0x8d05);
+	BinarySensor_Add(&Pin_A6, 0x8d06);
+	BinarySensor_Add(&Pin_A7, 0x8d07);
+	BinarySensor_Add(&Pin_F5, 0x8d08);
+	BinarySensor_Add(&Pin_F4, 0x8d09);
 
 	/* Brushless EDF Initialisation on pin */
 	Brushless_Init(&Pin_B5);

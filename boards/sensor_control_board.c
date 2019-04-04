@@ -17,7 +17,10 @@ int main() {
 #endif
 
 	sei();
-
+	
+	/*	AX12 Servos Initialisation	*/
+	AX12_InitAll(0x8d00);
+	
 	/*	Binary Sensors Initalisation	*/
 	BinarySensor_Add(&Pin_A4, 0x00007F0F);
 	BinarySensor_Add(&Pin_A3, 0x00007F10);
@@ -38,7 +41,7 @@ int main() {
 			can_t msg;
 
 			if (can_get_message(&msg)) {
-
+				if(AX12_OnMessage(&msg) == true) continue;
 
 
 			}
