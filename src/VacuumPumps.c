@@ -71,7 +71,7 @@ bool VacuumPump_OnMessage(can_t* canMsg) {
 
 				case 1:
 					Pin_WriteDigital(instances[i].pumpPin, PIN_HIGH);
-			Pin_WriteDigital(instances[i].switchPin, PIN_LOW);
+					Pin_WriteDigital(instances[i].switchPin, PIN_LOW);
 					break;
 
 			}

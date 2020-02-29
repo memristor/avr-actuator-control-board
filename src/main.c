@@ -30,19 +30,13 @@ int main() {
 	
 //	VacuumPump_Add(&Pin_C1, &Pin_B4, 1);
 	
-	VacuumPump_Add(&Pin_C4, &Pin_A6, 1);
-	VacuumPump_Add(&Pin_C3, &Pin_A4, 2);
-	VacuumPump_Add(&Pin_C2, &Pin_A2, 3);
-	SpecialPump_Add(&Pin_C6, &Pin_A1, &Pin_A7,4);
-	SpecialPump_Add(&Pin_C5, &Pin_A5, &Pin_A3,5);  
-	SpecialPump_Add(&Pin_C1, &Pin_B4, &Pin_B7,6);
-	SpecialPump_Add(&Pin_C6, &Pin_A1, &Pin_A7,7);
-	SpecialPump_Add(&Pin_C5, &Pin_A5, &Pin_A3,8);
-	SpecialPump_Add(&Pin_C1, &Pin_B4, &Pin_B7,9);
+	VacuumPump_Add(&Pin_A2, &Pin_C4, 1);
+	VacuumPump_Add(&Pin_A0, &Pin_C5, 2);
 
 	
+	
 
-	HBridge_Add(&Pin_E2, &Pin_B5, &Pin_B2, PIN_20KHz, 1);
+	//HBridge_Add(&Pin_E2, &Pin_B5, &Pin_B2, PIN_20KHz, 1);
 	
 #ifdef DEBUG
 	/* ALL Initialisations Passed and UART sends 'k' */
@@ -59,10 +53,10 @@ int main() {
 			if (can_get_message(&msg)) {
 
 
-				if(HBridge_OnMessage(&msg) == true) continue;
+				//if(HBridge_OnMessage(&msg) == true) continue;
 				if(VacuumPump_OnMessage(&msg) == true) continue;
-				if(SingleVacuumPump_OnMessage(&msg) == true) continue;
-				if(SingleSpecialPump_OnMessage(&msg)==true) continue;
+				//if(SingleVacuumPump_OnMessage(&msg) == true) continue;
+				//if(SingleSpecialPump_OnMessage(&msg)==true) continue;
 				if(AX12_OnMessage(&msg)==true) continue;
 			}
 		}
