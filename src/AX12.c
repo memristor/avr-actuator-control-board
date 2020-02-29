@@ -45,11 +45,14 @@ void AX12_UpdateAll(void) {
 }
 
 void AX12_InitAll(uint16_t canId) {
+	DDRD |= (1<<PD7);
+	PORTD |= (0<<PD7);
 	dynamixel_ax_init();
 	CAN_ID = canId;
 }
 
 bool AX12_OnMessage(can_t* canMsg) {
+	
 	if (unlikely(canMsg->id == CAN_ID)) {
 		uint8_t txpacket[11];
 		uint8_t rxpacket[11];

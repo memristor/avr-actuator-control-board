@@ -61,18 +61,21 @@ ISR(USART1_RX_vect) {
 
 void dynamixel_ax_init(void) {
 	// Set UART baudrate
-	UBRR0H = ((F_CPU / 8 + DYNAMIXEL_BAUDRATE / 2) / DYNAMIXEL_BAUDRATE - 1) >> 8;
-	UBRR0L = ((F_CPU / 8 + DYNAMIXEL_BAUDRATE / 2) / DYNAMIXEL_BAUDRATE - 1);
-	UCSR0A |= (1 << U2X0);
+	UBRR1H = ((F_CPU / 8 + DYNAMIXEL_BAUDRATE / 2) / DYNAMIXEL_BAUDRATE - 1) >> 8;
+	UBRR1L = ((F_CPU / 8 + DYNAMIXEL_BAUDRATE / 2) / DYNAMIXEL_BAUDRATE - 1);
+	UCSR1A |= (1 << U2X1);
 	
 	// Enable receiver and transmitter 
-	UCSR0B |= (1 << TXEN0);
-	UCSR0B |= (1 << RXEN0);
-	UCSR0B |= (1 << RXCIE0);
+	UCSR1B |= (1 << TXEN1);
+	UCSR1B |= (1 << RXEN1);
+	UCSR1B |= (1 << RXCIE1);
 	
-	DDRE |= (1 << PE0);
-	DDRE |= (1 << PE1);
+	DDRD |= (1 << PD2);
+	DDRD |= (1 << PD3);
+	DDRD |= (1 << PD7);
 	
+	PORTD &= ~(1 << PD7);
+
 	// Reset rx index
 	ax_buffer_index = 0;
 }
@@ -98,12 +101,12 @@ void dynamixel_rx_init(void) {
 }
 
 void ax_settx(void) {
-	UCSR0B &= ~(1 << RXEN0);	// Disable RX
+	UCSR1B &= ~(1 << RXEN1);	// Disable RX
 	
-	DDRE |= (1 << PE1);			// Set TX as output
-	DDRE &= ~(1 << PE0);		// Set RX as input
+	DDRD |= (1 << PD3);			// Set TX as output
+	DDRD &= ~(1 << PD2);		// Set RX as input
 	
-	UCSR0B |= (1 << TXEN0);		// Enable TX
+	UCSR1B |= (1 << TXEN1);		// Enable TX
 		
 	//UCSR0B &= ~(1 << RXCIE0);	// Disable RX interrupt
 }
@@ -111,21 +114,21 @@ void ax_settx(void) {
 
 void ax_setrx(void) {	
 	// Wait for TX complete flag before turning the bus around
-	while(bit_is_clear(UCSR0A, TXC0));
+	while(bit_is_clear(UCSR1A, TXC1));
 	
 	ax_buffer_index = 0;		// Reset RX index
 	
-	DDRE &= ~(1 << PE1);		// Set TX as input!
-	DDRE |= (1 << PE0);			// Set RX as output
+	DDRD &= ~(1 << PD3);		// Set TX as input!
+	DDRD |= (1 << PD2);			// Set RX as output
 	
-	UCSR0B &= ~(1 << TXEN0);	// Disable TX
+	UCSR1B &= ~(1 << TXEN1);	// Disable TX
 	//UCSR0B |= (1 << RXCIE0);	// Enable RX interrupt
-	UCSR0B |= (1 << RXEN0);		// Enable RX	
+	UCSR1B |= (1 << RXEN1);		// Enable RX	
 }
 
 void ax_write(uint8_t c) {
-	while(bit_is_clear(UCSR0A, UDRE0));
-	UDR0 = c;
+	while(bit_is_clear(UCSR1A, UDRE1));
+	UDR1 = c;
 }
 
 void rx_setrx(void) {
