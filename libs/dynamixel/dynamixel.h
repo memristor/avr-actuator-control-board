@@ -37,7 +37,7 @@
 
 #ifndef DYNAMIXEL_TIMEOUT_MS
 // Timeout in milliseconds
-#define DYNAMIXEL_TIMEOUT_MS 150
+#define DYNAMIXEL_TIMEOUT_MS 1
 #endif
 
 
