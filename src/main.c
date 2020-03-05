@@ -24,16 +24,18 @@ int main() {
 	CANbus_Init();
 
 	/*	Vacuum Pump and Vacuum Switches Initialisation	*/
-	/*	Function:	VacuumPump_Add(&pumpPin, &switchPin, number)*/
+	/*	Function:	VacuumPump_Add(&pumpPin, &switchPin, number)*/num
 	
 	AX12_InitAll(AX12_CANID);
 	
 //	VacuumPump_Add(&Pin_C1, &Pin_B4, 1);
 	
-	VacuumPump_Add(&Pin_A2, &Pin_C4, 1);
-	VacuumPump_Add(&Pin_A0, &Pin_C5, 2);
-
-	
+	SpecialPump_Add(&Pin_A2, &Pin_C6, &Pin_C4,1);  
+	SpecialPump_Add(&Pin_A3, &Pin_C3, &Pin_C2,2);
+	SpecialPump_Add(&Pin_A4, &Pin_C1, &Pin_C0,3);
+	SpecialPump_Add(&Pin_A2, &Pin_C6, &Pin_C4,7);  
+	SpecialPump_Add(&Pin_A3, &Pin_C3, &Pin_C2,8);
+	SpecialPump_Add(&Pin_A4, &Pin_C1, &Pin_C0,9);
 	
 
 	//HBridge_Add(&Pin_E2, &Pin_B5, &Pin_B2, PIN_20KHz, 1);
@@ -54,9 +56,9 @@ int main() {
 
 
 				//if(HBridge_OnMessage(&msg) == true) continue;
-				if(VacuumPump_OnMessage(&msg) == true) continue;
+				//if(VacuumPump_OnMessage(&msg) == true) continue;
 				//if(SingleVacuumPump_OnMessage(&msg) == true) continue;
-				//if(SingleSpecialPump_OnMessage(&msg)==true) continue;
+				if(SingleSpecialPump_OnMessage(&msg)==true) continue;
 				if(AX12_OnMessage(&msg)==true) continue;
 			}
 		}
