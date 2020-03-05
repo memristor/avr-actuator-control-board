@@ -24,14 +24,12 @@ int main() {
 
 	/*	Vacuum Pump and Vacuum Switches Initialisation	*/
 	/*	Function:	VacuumPump_Add(&pumpPin, &switchPin, number)*/
-	//VacuumPump_Add(&Pin_C1, &Pin_B4, 1);
-	VacuumPump_Add(&Pin_C2, &Pin_A6, 1);
-	VacuumPump_Add(&Pin_C3, &Pin_B4, 2);
-	VacuumPump_Add(&Pin_C4, &Pin_A1, 3);
-	VacuumPump_Add(&Pin_C5, &Pin_A2, 4);
-	VacuumPump_Add(&Pin_C1, &Pin_A4, 5);
+	/*	Function:	SpecialPump_Add(&pumpPin, &switchPin1, &switchPin2, number)*/
+	SpecialPump_Add(&Pin_A2, &Pin_C5,&Pin_C3, 1);
+	SpecialPump_Add(&Pin_A3, &Pin_C4,&Pin_C2, 2);
+	SpecialPump_Add(&Pin_A4, &Pin_C7,&Pin_C6, 3);
 
-	HBridge_Add(&Pin_E2, &Pin_B5, &Pin_B2, PIN_20KHz, 1);
+	//HBridge_Add(&Pin_E2, &Pin_B5, &Pin_B2, PIN_20KHz, 1);
 
 #ifdef DEBUG
 	/* ALL Initialisations Passed and UART sends 'k' */
