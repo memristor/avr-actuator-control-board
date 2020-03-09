@@ -55,7 +55,7 @@ int main() {
 
 				//if(HBridge_OnMessage(&msg) == true) continue;
 				if(VacuumPump_OnMessage(&msg) == true) continue;
-				//if(SingleVacuumPump_OnMessage(&msg) == true) continue;
+				if(SingleVacuumPump_OnMessage(&msg) == true) continue;
 				//if(SingleSpecialPump_OnMessage(&msg)==true) continue;
 				if(AX12_OnMessage(&msg)==true) continue;
 			}
