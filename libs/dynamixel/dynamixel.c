@@ -2,8 +2,10 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <string.h>
+#include <can/can_wrapper.h>
 
 #include "dynamixel.h"
+//#define DEBUG_AX12
 
 // General
 static uint8_t calculatechecksum(volatile uint8_t* packet);
@@ -27,8 +29,8 @@ static volatile uint8_t rx_buffer_index = 0;
 static void rx_write(uint8_t c);
 
 
-ISR(USART0_RX_vect) {
-	uint8_t data = UDR0;
+ISR(USART1_RX_vect) {
+	uint8_t data = UDR1;
 	
 	ax_buffer[ax_buffer_index] = data;
 	if (ax_buffer_index < DYNAMIXEL_PACKET_SIZE - 1) {
@@ -47,7 +49,7 @@ ISR(USART0_RX_vect) {
 	}
 }
 
-ISR(USART1_RX_vect) {
+/*ISR(USART1_RX_vect) {
 	rx_buffer[rx_buffer_index] = UDR1;
 	if (rx_buffer_index < DYNAMIXEL_PACKET_SIZE - 1) {
 		rx_buffer_index++;
@@ -57,7 +59,7 @@ ISR(USART1_RX_vect) {
 	if (rx_buffer_index == 1 && rx_buffer[0] != 0xFF) {
 		rx_buffer_index = 0;
 	}
-}
+}*/
 
 void dynamixel_ax_init(void) {
 	// Set UART baudrate
@@ -169,6 +171,15 @@ uint8_t readpacket(
 
 	while(*recv_buffer_index < packetlength) {
 		if(ulcounter++ > (DYNAMIXEL_TIMEOUT_MS) * 10) {
+		#ifdef DEBUG_AX12
+			can_t msg;
+			msg.id = 0x00006C02;
+			msg.flags.rtr = 0;
+			msg.flags.extended = 1;
+			msg.data[0] = *recv_buffer_index;
+			msg.length = 1;
+			can_send_message(&msg);
+		#endif
 			return DYNAMIXEL_RX_TIMEOUT;
 		}
 		_delay_us(100);
@@ -196,6 +207,7 @@ uint8_t dynamixel_ax_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket
 	uint8_t txlength = txpacket[DYNAMIXEL_LENGTH] + 4;
 	uint8_t status = DYNAMIXEL_SUCCESS;
 	
+	
 	txpacket[0] = (uint8_t) 0xff;
 	txpacket[1] = (uint8_t) 0xff;
 	txpacket[txlength - 1] = (uint8_t)calculatechecksum(txpacket);
@@ -217,7 +229,15 @@ uint8_t dynamixel_ax_txrx(volatile uint8_t* txpacket, volatile uint8_t* rxpacket
 			else {
 				rxlength = 6;
 			}
-			
+		#ifdef DEBUG_AX12
+			can_t msg;
+			msg.id = 0x00006C01;
+			msg.flags.rtr = 0;
+			msg.flags.extended = 1;
+			msg.data[0] = rxlength;
+			msg.length = 1;
+			can_send_message(&msg);
+		#endif
 			status = readpacket(rxpacket, rxlength, ax_buffer, &ax_buffer_index);
 			if (status == DYNAMIXEL_SUCCESS) {
 				return status;
