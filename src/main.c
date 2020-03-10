@@ -24,7 +24,7 @@ int main() {
 	CANbus_Init();
 
 	/*	Vacuum Pump and Vacuum Switches Initialisation	*/
-	/*	Function:	VacuumPump_Add(&pumpPin, &switchPin, number)*/num
+	/*	Function:	VacuumPump_Add(&pumpPin, &switchPin, number)*/
 	
 	AX12_InitAll(AX12_CANID);
 	
