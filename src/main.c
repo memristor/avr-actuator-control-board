@@ -30,11 +30,11 @@ int main() {
 	
 //	VacuumPump_Add(&Pin_C1, &Pin_B4, 1);
 	
-	SpecialPump_Add(&Pin_A2, &Pin_C6, &Pin_C4,1);  
-	SpecialPump_Add(&Pin_A3, &Pin_C3, &Pin_C2,2);
+	SpecialPump_Add(&Pin_A3, &Pin_C4, &Pin_C5,1);  
+	SpecialPump_Add(&Pin_A2, &Pin_C3, &Pin_C2,2);
 	SpecialPump_Add(&Pin_A4, &Pin_C1, &Pin_C0,3);
-	SpecialPump_Add(&Pin_A2, &Pin_C6, &Pin_C4,7);  
-	SpecialPump_Add(&Pin_A3, &Pin_C3, &Pin_C2,8);
+	SpecialPump_Add(&Pin_A3, &Pin_C4, &Pin_C5,7);  
+	SpecialPump_Add(&Pin_A2, &Pin_C3, &Pin_C2,8);
 	SpecialPump_Add(&Pin_A4, &Pin_C1, &Pin_C0,9);
 	
 
