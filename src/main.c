@@ -30,11 +30,14 @@ int main() {
 	
 //	VacuumPump_Add(&Pin_C1, &Pin_B4, 1);
 	
-	VacuumPump_Add(&Pin_A2, &Pin_C4, 1);
-	VacuumPump_Add(&Pin_A0, &Pin_C5, 2);
+//	Pins for Actuator Control Board v2.2
+//	VacuumPump_Add(&Pin_A2, &Pin_C4, 1);
+//	VacuumPump_Add(&Pin_A0, &Pin_C5, 2);
 
-	
-	
+//	Pins for Actuator Control Board v2 proto
+	VacuumPump_Add(&Pin_C2, &Pin_C1, 1);
+	VacuumPump_Add(&Pin_C4, &Pin_C6, 2);
+
 
 	//HBridge_Add(&Pin_E2, &Pin_B5, &Pin_B2, PIN_20KHz, 1);
 	
