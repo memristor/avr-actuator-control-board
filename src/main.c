@@ -30,12 +30,12 @@ int main() {
 	
 //	VacuumPump_Add(&Pin_C1, &Pin_B4, 1);
 	
-	SpecialPump_Add(&Pin_A3, &Pin_C4, &Pin_C5,1);  
+	SpecialPump_Add(&Pin_A0, &Pin_C4, &Pin_C5,1);  
 	SpecialPump_Add(&Pin_A2, &Pin_C3, &Pin_C2,2);
-	SpecialPump_Add(&Pin_A4, &Pin_C1, &Pin_C0,3);
-	SpecialPump_Add(&Pin_A3, &Pin_C4, &Pin_C5,7);  
+	SpecialPump_Add(&Pin_A1, &Pin_C1, &Pin_C6,3);
+	SpecialPump_Add(&Pin_A0, &Pin_C4, &Pin_C5,7);  
 	SpecialPump_Add(&Pin_A2, &Pin_C3, &Pin_C2,8);
-	SpecialPump_Add(&Pin_A4, &Pin_C1, &Pin_C0,9);
+	SpecialPump_Add(&Pin_A1, &Pin_C1, &Pin_C6,9);
 	
 
 	//HBridge_Add(&Pin_E2, &Pin_B5, &Pin_B2, PIN_20KHz, 1);
